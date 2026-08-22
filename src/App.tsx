@@ -6,7 +6,9 @@ import { StatCard } from "./components/StatCard";
 import { GoalsSection } from "./components/GoalsSection";
 import { YearProgressChart } from "./components/YearProgressChart";
 import { PowerRadar } from "./components/PowerRadar";
-import { WeeklyChart } from "./components/WeeklyChart";
+import { WeeklyAreaChart } from "./components/WeeklyAreaChart";
+import { EfficiencyAreaChart } from "./components/EfficiencyAreaChart";
+import { FitnessChart } from "./components/FitnessChart";
 import { ActivityList } from "./components/ActivityList";
 
 export default function App() {
@@ -171,9 +173,19 @@ export default function App() {
         </section>
       )}
 
-      {/* Weekly Chart */}
+      {/* Weekly Area Chart */}
       <section className="mb-8">
-        <WeeklyChart activities={activities} />
+        <WeeklyAreaChart activities={activities} />
+      </section>
+
+      {/* Efficiency Area - Interactive */}
+      <section className="mb-8">
+        <EfficiencyAreaChart activities={activities} />
+      </section>
+
+      {/* Fitness & Form */}
+      <section className="mb-8">
+        <FitnessChart activities={activities} />
       </section>
 
       {/* Recent Activities */}
