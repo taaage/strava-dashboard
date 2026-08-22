@@ -1,4 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_BASE ?? "https://api.tiggenilsson.se";
+const USE_MOCK = import.meta.env.DEV && !import.meta.env.VITE_API_BASE;
 
 export interface StravaAthlete {
   id: number;
@@ -71,17 +72,21 @@ async function apiFetch<T>(endpoint: string): Promise<T> {
 }
 
 export function getAthlete(): Promise<StravaAthlete> {
+  if (USE_MOCK) return import("./mock").then((m) => m.mockAthlete);
   return apiFetch("/api/athlete");
 }
 
 export function getStats(): Promise<StravaStats> {
+  if (USE_MOCK) return import("./mock").then((m) => m.mockStats);
   return apiFetch("/api/stats");
 }
 
 export function getActivities(): Promise<StravaActivity[]> {
+  if (USE_MOCK) return import("./mock").then((m) => m.mockActivities);
   return apiFetch("/api/activities?pages=10");
 }
 
 export function getPowerRecords(): Promise<PowerRecords> {
+  if (USE_MOCK) return import("./mock").then((m) => m.mockPowerRecords);
   return apiFetch("/api/power-records?max=20");
 }
