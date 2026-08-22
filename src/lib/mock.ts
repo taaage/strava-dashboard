@@ -142,3 +142,26 @@ function generateRides(count: number): StravaActivity[] {
 }
 
 export const mockActivities: StravaActivity[] = generateRides(180);
+
+export const mockZones = {
+  powerZones: {
+    "0-0": 2100,
+    "0-50": 4800,
+    "50-100": 8200,
+    "100-150": 12500,
+    "150-200": 28000,
+    "200-250": 45000,
+    "250-300": 18000,
+    "300-350": 5200,
+    "350-400": 1800,
+    "400-450": 600,
+    "450--1": 200,
+  },
+  hrZones: {
+    "0-121": 15000,
+    "121-147": 72000,
+    "147-161": 28000,
+    "161-181": 8500,
+    "181--1": 1200,
+  },
+};

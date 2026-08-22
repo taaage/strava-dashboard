@@ -63,6 +63,11 @@ export interface PowerRecords {
   "60min": number;
 }
 
+export interface ZoneData {
+  powerZones: Record<string, number>;
+  hrZones: Record<string, number>;
+}
+
 async function apiFetch<T>(endpoint: string): Promise<T> {
   const response = await fetch(`${API_BASE}${endpoint}`);
   if (!response.ok) {
@@ -89,4 +94,9 @@ export function getActivities(): Promise<StravaActivity[]> {
 export function getPowerRecords(): Promise<PowerRecords> {
   if (USE_MOCK) return import("./mock").then((m) => m.mockPowerRecords);
   return apiFetch("/api/power-records?max=20");
+}
+
+export function getZones(): Promise<ZoneData> {
+  if (USE_MOCK) return import("./mock").then((m) => m.mockZones);
+  return apiFetch("/api/zones?max=20");
 }

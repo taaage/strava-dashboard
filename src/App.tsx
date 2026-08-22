@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getAthlete, getStats, getActivities, getPowerRecords } from "./lib/api";
-import type { StravaAthlete, StravaStats, StravaActivity, PowerRecords } from "./lib/api";
+import { getAthlete, getStats, getActivities, getPowerRecords, getZones } from "./lib/api";
+import type { StravaAthlete, StravaStats, StravaActivity, PowerRecords, ZoneData } from "./lib/api";
 import { formatDistance, formatDuration, formatElevation } from "./lib/utils";
 import { StatCard } from "./components/StatCard";
 import { GoalsSection } from "./components/GoalsSection";
@@ -9,6 +9,8 @@ import { PowerRadar } from "./components/PowerRadar";
 import { WeeklyAreaChart } from "./components/WeeklyAreaChart";
 import { EfficiencyAreaChart } from "./components/EfficiencyAreaChart";
 import { FitnessChart } from "./components/FitnessChart";
+import { WeeklyTSSChart } from "./components/WeeklyTSSChart";
+import { PowerZoneChart, HRZoneChart } from "./components/ZoneCharts";
 import { ActivityList } from "./components/ActivityList";
 
 export default function App() {
@@ -16,6 +18,7 @@ export default function App() {
   const [stats, setStats] = useState<StravaStats | null>(null);
   const [activities, setActivities] = useState<StravaActivity[]>([]);
   const [powerRecords, setPowerRecords] = useState<PowerRecords | null>(null);
+  const [zones, setZones] = useState<ZoneData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,8 +34,9 @@ export default function App() {
         setStats(s);
         setActivities(acts);
 
-        // Fetch power records in background (slower)
+        // Fetch power records and zones in background (slower)
         getPowerRecords().then(setPowerRecords).catch(console.error);
+        getZones().then(setZones).catch(console.error);
       } catch (e) {
         setError(String(e));
       } finally {
@@ -187,6 +191,25 @@ export default function App() {
       <section className="mb-8">
         <FitnessChart activities={activities} />
       </section>
+
+      {/* Weekly TSS */}
+      <section className="mb-8">
+        <WeeklyTSSChart activities={activities} />
+      </section>
+
+      {/* Power Zones */}
+      {zones && (
+        <section className="mb-8">
+          <PowerZoneChart zones={zones} />
+        </section>
+      )}
+
+      {/* HR Zones */}
+      {zones && (
+        <section className="mb-8">
+          <HRZoneChart zones={zones} />
+        </section>
+      )}
 
       {/* Recent Activities */}
       <section>
