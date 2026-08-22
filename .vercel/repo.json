@@ -1,0 +1,11 @@
+{
+  "remoteName": "origin",
+  "projects": [
+    {
+      "id": "prj_e04ceeHTJM3BvJmNxV3paR5wjktC",
+      "name": "strava-dashboard",
+      "directory": ".",
+      "orgId": "team_ptHPgpPmA04rlr9KuCzsm3NN"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/ActivityList.tsx","./src/components/GoalsSection.tsx","./src/components/PowerRadar.tsx","./src/components/RadialProgress.tsx","./src/components/StatCard.tsx","./src/components/WeeklyChart.tsx","./src/components/YearProgressChart.tsx","./src/lib/api.ts","./src/lib/utils.ts"],"version":"5.9.3"}
