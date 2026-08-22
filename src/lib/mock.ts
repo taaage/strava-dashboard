@@ -1,4 +1,9 @@
-import type { StravaAthlete, StravaStats, StravaActivity, PowerRecords } from "./api";
+import type {
+  StravaAthlete,
+  StravaStats,
+  StravaActivity,
+  PowerRecords,
+} from "./api";
 
 export const mockAthlete: StravaAthlete = {
   id: 87275826,
@@ -10,9 +15,27 @@ export const mockAthlete: StravaAthlete = {
 };
 
 export const mockStats: StravaStats = {
-  recent_ride_totals: { count: 12, distance: 580000, moving_time: 72000, elapsed_time: 75000, elevation_gain: 4200 },
-  ytd_ride_totals: { count: 177, distance: 6808600, moving_time: 827280, elapsed_time: 860000, elevation_gain: 65420 },
-  all_ride_totals: { count: 520, distance: 18500000, moving_time: 2400000, elapsed_time: 2500000, elevation_gain: 185000 },
+  recent_ride_totals: {
+    count: 12,
+    distance: 580000,
+    moving_time: 72000,
+    elapsed_time: 75000,
+    elevation_gain: 4200,
+  },
+  ytd_ride_totals: {
+    count: 177,
+    distance: 6808600,
+    moving_time: 827280,
+    elapsed_time: 860000,
+    elevation_gain: 65420,
+  },
+  all_ride_totals: {
+    count: 520,
+    distance: 18500000,
+    moving_time: 2400000,
+    elapsed_time: 2500000,
+    elevation_gain: 185000,
+  },
 };
 
 export const mockPowerRecords: PowerRecords = {
@@ -49,13 +72,21 @@ function generateRides(count: number): StravaActivity[] {
     date.setDate(date.getDate() - Math.floor(i * 2.5));
     const distance = 30000 + random() * 60000;
     const movingTime = distance / (7 + random() * 3);
-    const isIndoor = random() < 0.15;
+    const isIndoor = i % 5 === 2 || i % 7 === 4;
 
     rides.push({
       id: 19800000000 - i,
       name: isIndoor
         ? ["Zwift Race", "Indoor Session", "Recovery Spin"][i % 3]
-        : ["Morning Ride", "Lunch Ride", "Evening Ride", "Weekend Long Ride", "Hill Repeats", "Coffee Ride", "Group Ride"][i % 7],
+        : [
+            "Morning Ride",
+            "Lunch Ride",
+            "Evening Ride",
+            "Weekend Long Ride",
+            "Hill Repeats",
+            "Coffee Ride",
+            "Group Ride",
+          ][i % 7],
       type: isIndoor ? "VirtualRide" : "Ride",
       sport_type: "Ride",
       distance,
@@ -77,7 +108,11 @@ function generateRides(count: number): StravaActivity[] {
 
   // Add some last year rides
   for (let i = 0; i < 150; i++) {
-    const date = new Date(now.getFullYear() - 1, Math.floor(i / 13), (i % 28) + 1);
+    const date = new Date(
+      now.getFullYear() - 1,
+      Math.floor(i / 13),
+      (i % 28) + 1,
+    );
     const distance = 25000 + random() * 55000;
     const movingTime = distance / (6.5 + random() * 3);
 
