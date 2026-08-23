@@ -70,7 +70,14 @@ export interface ZoneData {
 
 async function apiFetch<T>(endpoint: string, fallback: T): Promise<T> {
   try {
-    const response = await fetch(`${API_BASE}${endpoint}`);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
     if (!response.ok) return fallback;
     const data = await response.json();
     return data ?? fallback;

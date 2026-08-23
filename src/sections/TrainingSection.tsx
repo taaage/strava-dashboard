@@ -4,6 +4,7 @@ import { WeeklyAreaChart } from "../components/WeeklyAreaChart";
 import { EfficiencyAreaChart } from "../components/EfficiencyAreaChart";
 import { FitnessChart } from "../components/FitnessChart";
 import { WeeklyTSSChart } from "../components/WeeklyTSSChart";
+import { CardPlaceholder } from "../components/CardPlaceholder";
 
 export function TrainingSection() {
   const { data: activities = [] } = useQuery({
@@ -11,22 +12,27 @@ export function TrainingSection() {
     queryFn: getActivities,
   });
 
-  if (activities.length === 0) return null;
+  if (activities.length === 0) {
+    return (
+      <>
+        {[...Array(4)].map((_, i) => (
+          <section key={i} className="mb-8"><CardPlaceholder /></section>
+        ))}
+      </>
+    );
+  }
 
   return (
     <>
       <section className="mb-8">
         <WeeklyAreaChart activities={activities} />
       </section>
-
       <section className="mb-8">
         <EfficiencyAreaChart activities={activities} />
       </section>
-
       <section className="mb-8">
         <FitnessChart activities={activities} />
       </section>
-
       <section className="mb-8">
         <WeeklyTSSChart activities={activities} />
       </section>

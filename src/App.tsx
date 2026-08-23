@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAthlete } from "./lib/api";
-import { Skeleton } from "./components/Skeleton";
 import { OverviewSection } from "./sections/OverviewSection";
 import { StatsSection } from "./sections/StatsSection";
 import { PowerSection } from "./sections/PowerSection";
@@ -9,12 +8,10 @@ import { ZonesSection } from "./sections/ZonesSection";
 import { ActivitiesSection } from "./sections/ActivitiesSection";
 
 export default function App() {
-  const { data: athlete, isLoading } = useQuery({
+  const { data: athlete } = useQuery({
     queryKey: ["athlete"],
     queryFn: getAthlete,
   });
-
-  if (isLoading) return <Skeleton />;
 
   return (
     <main className="px-6 py-12 max-w-4xl mx-auto">
