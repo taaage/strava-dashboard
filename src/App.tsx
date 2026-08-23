@@ -1,214 +1,55 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAthlete, getStats, getActivities, getPowerRecords, getZones } from "./lib/api";
-import { formatDistance, formatDuration, formatElevation } from "./lib/utils";
-import { StatCard } from "./components/StatCard";
-import { GoalsSection } from "./components/GoalsSection";
-import { YearProgressChart } from "./components/YearProgressChart";
-import { PowerRadar } from "./components/PowerRadar";
-import { WeeklyAreaChart } from "./components/WeeklyAreaChart";
-import { EfficiencyAreaChart } from "./components/EfficiencyAreaChart";
-import { FitnessChart } from "./components/FitnessChart";
-import { WeeklyTSSChart } from "./components/WeeklyTSSChart";
-import { PowerZoneChart, HRZoneChart } from "./components/ZoneCharts";
-import { ActivityList } from "./components/ActivityList";
+import { getAthlete } from "./lib/api";
+import { Skeleton } from "./components/Skeleton";
+import { OverviewSection } from "./sections/OverviewSection";
+import { StatsSection } from "./sections/StatsSection";
+import { PowerSection } from "./sections/PowerSection";
+import { TrainingSection } from "./sections/TrainingSection";
+import { ZonesSection } from "./sections/ZonesSection";
+import { ActivitiesSection } from "./sections/ActivitiesSection";
 
 export default function App() {
-  const { data: athlete, isLoading: athleteLoading, error: athleteError } = useQuery({
+  const {
+    data: athlete,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["athlete"],
     queryFn: getAthlete,
   });
 
-  const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ["stats"],
-    queryFn: getStats,
-  });
+  if (isLoading) return <Skeleton />;
 
-  const { data: activities = [], isLoading: activitiesLoading } = useQuery({
-    queryKey: ["activities"],
-    queryFn: getActivities,
-  });
-
-  const { data: powerRecords } = useQuery({
-    queryKey: ["powerRecords"],
-    queryFn: getPowerRecords,
-  });
-
-  const { data: zones } = useQuery({
-    queryKey: ["zones"],
-    queryFn: getZones,
-  });
-
-  const loading = athleteLoading || statsLoading || activitiesLoading;
-
-  if (loading) {
-    return (
-      <main className="px-6 py-12 max-w-4xl mx-auto">
-        {/* Header skeleton */}
-        <div className="mb-10">
-          <div className="h-8 w-48 bg-surface-card rounded-xl animate-pulse" />
-          <div className="h-4 w-64 bg-surface-card rounded-lg animate-pulse mt-2" />
-        </div>
-
-        {/* Goals skeleton */}
-        <section className="mb-8">
-          <div className="h-4 w-16 bg-surface-card rounded animate-pulse mb-3" />
-          <div className="grid grid-cols-3 gap-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-surface-card rounded-3xl p-6 border border-surface-border h-56" />
-            ))}
-          </div>
-        </section>
-
-        {/* Year progress skeleton */}
-        <section className="mb-8">
-          <div className="bg-surface-card rounded-3xl p-8 border border-surface-border h-96" />
-        </section>
-
-        {/* Stats skeleton */}
-        <section className="mb-8">
-          <div className="h-4 w-20 bg-surface-card rounded animate-pulse mb-3" />
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-surface-card rounded-3xl p-6 border border-surface-border h-28" />
-            ))}
-          </div>
-        </section>
-      </main>
-    );
-  }
-
-  if (athleteError || !athlete || !stats) {
+  if (error || !athlete) {
     return (
       <main className="px-6 py-12 max-w-4xl mx-auto">
         <div className="bg-surface-card rounded-3xl p-8 border border-surface-border text-center">
-          <h1 className="text-xl font-semibold text-text-primary mb-2">Connection Error</h1>
-          <p className="text-text-secondary">Could not load data from Strava API.</p>
-          <p className="text-sm text-text-muted mt-2">{String(athleteError)}</p>
+          <h1 className="text-xl font-semibold text-text-primary mb-2">
+            Connection Error
+          </h1>
+          <p className="text-text-secondary">
+            Could not load data from Strava API.
+          </p>
+          <p className="text-sm text-text-muted mt-2">{String(error)}</p>
         </div>
       </main>
     );
   }
 
-  const ytd = stats.ytd_ride_totals;
-  const allTime = stats.all_ride_totals;
-
-  // Last year comparison
-  const now = new Date();
-  const lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
-  const lastYearSamePoint = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-
-  const lastYearRides = activities.filter((a) => {
-    const isRide = a.type === "Ride" || a.sport_type === "Ride" || a.type === "VirtualRide";
-    const date = new Date(a.start_date_local);
-    return isRide && date >= lastYearStart && date <= lastYearSamePoint;
-  });
-
-  const lastYearStats = {
-    distance: lastYearRides.reduce((sum, a) => sum + a.distance, 0),
-    count: lastYearRides.length,
-    moving_time: lastYearRides.reduce((sum, a) => sum + a.moving_time, 0),
-    elevation_gain: lastYearRides.reduce((sum, a) => sum + a.total_elevation_gain, 0),
-  };
-
-  const distanceDiffPct = lastYearStats.distance > 0
-    ? Math.round(((ytd.distance - lastYearStats.distance) / lastYearStats.distance) * 100)
-    : 0;
-  const ridesDiff = ytd.count - lastYearStats.count;
-  const timeDiffPct = lastYearStats.moving_time > 0
-    ? Math.round(((ytd.moving_time - lastYearStats.moving_time) / lastYearStats.moving_time) * 100)
-    : 0;
-  const elevationDiffPct = lastYearStats.elevation_gain > 0
-    ? Math.round(((ytd.elevation_gain - lastYearStats.elevation_gain) / lastYearStats.elevation_gain) * 100)
-    : 0;
-
   return (
     <main className="px-6 py-12 max-w-4xl mx-auto">
-      {/* Header */}
       <div className="mb-10">
         <h1 className="text-2xl font-semibold text-text-primary">
           Hey {athlete.firstname} 👋
         </h1>
         <p className="text-text-muted mt-1">Here's how your riding is going</p>
       </div>
-
-      {/* Goals */}
-      <section className="mb-8">
-        <p className="text-xs font-medium text-text-muted uppercase tracking-wider mb-3 px-1">Goals</p>
-        <GoalsSection activities={activities} stats={stats} />
-      </section>
-
-      {/* Year Progress */}
-      <section className="mb-8">
-        <YearProgressChart activities={activities} />
-      </section>
-
-      {/* YTD Stats */}
-      <section className="mb-8">
-        <p className="text-xs font-medium text-text-muted uppercase tracking-wider mb-3 px-1">This year</p>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatCard title="Distance" value={formatDistance(ytd.distance)} comparison={{ value: distanceDiffPct, unit: "%", isPercentage: true }} />
-          <StatCard title="Rides" value={ytd.count.toString()} comparison={{ value: ridesDiff, unit: "rides" }} />
-          <StatCard title="Time" value={formatDuration(ytd.moving_time)} comparison={{ value: timeDiffPct, unit: "%", isPercentage: true }} />
-          <StatCard title="Elevation" value={formatElevation(ytd.elevation_gain)} comparison={{ value: elevationDiffPct, unit: "%", isPercentage: true }} />
-        </div>
-      </section>
-
-      {/* All Time Stats */}
-      <section className="mb-8">
-        <p className="text-xs font-medium text-text-muted uppercase tracking-wider mb-3 px-1">All time</p>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatCard title="Distance" value={formatDistance(allTime.distance)} />
-          <StatCard title="Rides" value={allTime.count.toString()} />
-          <StatCard title="Time" value={formatDuration(allTime.moving_time)} />
-          <StatCard title="Elevation" value={formatElevation(allTime.elevation_gain)} />
-        </div>
-      </section>
-
-      {/* Power Records */}
-      {powerRecords && (
-        <section className="mb-8">
-          <PowerRadar records={powerRecords} />
-        </section>
-      )}
-
-      {/* Weekly Area Chart */}
-      <section className="mb-8">
-        <WeeklyAreaChart activities={activities} />
-      </section>
-
-      {/* Efficiency Area - Interactive */}
-      <section className="mb-8">
-        <EfficiencyAreaChart activities={activities} />
-      </section>
-
-      {/* Fitness & Form */}
-      <section className="mb-8">
-        <FitnessChart activities={activities} />
-      </section>
-
-      {/* Weekly TSS */}
-      <section className="mb-8">
-        <WeeklyTSSChart activities={activities} />
-      </section>
-
-      {/* Power Zones */}
-      {zones && (
-        <section className="mb-8">
-          <PowerZoneChart zones={zones} />
-        </section>
-      )}
-
-      {/* HR Zones */}
-      {zones && (
-        <section className="mb-8">
-          <HRZoneChart zones={zones} />
-        </section>
-      )}
-
-      {/* Recent Activities */}
-      <section>
-        <ActivityList activities={activities} />
-      </section>
+      <OverviewSection />
+      <StatsSection />
+      <PowerSection />
+      <TrainingSection />
+      <ZonesSection />
+      <ActivitiesSection />
     </main>
   );
 }
