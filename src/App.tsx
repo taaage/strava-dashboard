@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getAthlete, getStats, getActivities, getPowerRecords, getZones } from "./lib/api";
-import type { StravaAthlete, StravaStats, StravaActivity, PowerRecords, ZoneData } from "./lib/api";
 import { formatDistance, formatDuration, formatElevation } from "./lib/utils";
 import { StatCard } from "./components/StatCard";
 import { GoalsSection } from "./components/GoalsSection";
@@ -14,37 +13,32 @@ import { PowerZoneChart, HRZoneChart } from "./components/ZoneCharts";
 import { ActivityList } from "./components/ActivityList";
 
 export default function App() {
-  const [athlete, setAthlete] = useState<StravaAthlete | null>(null);
-  const [stats, setStats] = useState<StravaStats | null>(null);
-  const [activities, setActivities] = useState<StravaActivity[]>([]);
-  const [powerRecords, setPowerRecords] = useState<PowerRecords | null>(null);
-  const [zones, setZones] = useState<ZoneData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: athlete, isLoading: athleteLoading, error: athleteError } = useQuery({
+    queryKey: ["athlete"],
+    queryFn: getAthlete,
+  });
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [a, s, acts] = await Promise.all([
-          getAthlete(),
-          getStats(),
-          getActivities(),
-        ]);
-        setAthlete(a);
-        setStats(s);
-        setActivities(acts);
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ["stats"],
+    queryFn: getStats,
+  });
 
-        // Fetch power records and zones in background (slower)
-        getPowerRecords().then(setPowerRecords).catch(console.error);
-        getZones().then(setZones).catch(console.error);
-      } catch (e) {
-        setError(String(e));
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+  const { data: activities = [], isLoading: activitiesLoading } = useQuery({
+    queryKey: ["activities"],
+    queryFn: getActivities,
+  });
+
+  const { data: powerRecords } = useQuery({
+    queryKey: ["powerRecords"],
+    queryFn: getPowerRecords,
+  });
+
+  const { data: zones } = useQuery({
+    queryKey: ["zones"],
+    queryFn: getZones,
+  });
+
+  const loading = athleteLoading || statsLoading || activitiesLoading;
 
   if (loading) {
     return (
@@ -83,13 +77,13 @@ export default function App() {
     );
   }
 
-  if (error || !athlete || !stats) {
+  if (athleteError || !athlete || !stats) {
     return (
       <main className="px-6 py-12 max-w-4xl mx-auto">
         <div className="bg-surface-card rounded-3xl p-8 border border-surface-border text-center">
           <h1 className="text-xl font-semibold text-text-primary mb-2">Connection Error</h1>
           <p className="text-text-secondary">Could not load data from Strava API.</p>
-          <p className="text-sm text-text-muted mt-2">{error}</p>
+          <p className="text-sm text-text-muted mt-2">{String(athleteError)}</p>
         </div>
       </main>
     );
