@@ -68,35 +68,53 @@ export interface ZoneData {
   hrZones: Record<string, number>;
 }
 
-async function apiFetch<T>(endpoint: string): Promise<T> {
-  const response = await fetch(`${API_BASE}${endpoint}`);
-  if (!response.ok) {
-    throw new Error(`API error: ${response.status}`);
+async function apiFetch<T>(endpoint: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(`${API_BASE}${endpoint}`);
+    if (!response.ok) return fallback;
+    const data = await response.json();
+    return data ?? fallback;
+  } catch {
+    return fallback;
   }
-  return response.json();
 }
 
-export function getAthlete(): Promise<StravaAthlete> {
+const EMPTY_STATS: StravaStats = {
+  recent_ride_totals: { count: 0, distance: 0, moving_time: 0, elapsed_time: 0, elevation_gain: 0 },
+  ytd_ride_totals: { count: 0, distance: 0, moving_time: 0, elapsed_time: 0, elevation_gain: 0 },
+  all_ride_totals: { count: 0, distance: 0, moving_time: 0, elapsed_time: 0, elevation_gain: 0 },
+};
+
+const EMPTY_POWER: PowerRecords = {
+  "5s": 0, "15s": 0, "30s": 0, "1min": 0, "2min": 0, "3min": 0,
+  "5min": 0, "8min": 0, "10min": 0, "15min": 0, "20min": 0,
+  "30min": 0, "45min": 0, "60min": 0,
+};
+
+const EMPTY_ZONES: ZoneData = { powerZones: {}, hrZones: {} };
+
+export function getAthlete(): Promise<StravaAthlete | null> {
   if (USE_MOCK) return import("./mock").then((m) => m.mockAthlete);
-  return apiFetch("/api/athlete");
+  return apiFetch("/api/athlete", null);
 }
 
 export function getStats(): Promise<StravaStats> {
   if (USE_MOCK) return import("./mock").then((m) => m.mockStats);
-  return apiFetch("/api/stats");
+  return apiFetch("/api/stats", EMPTY_STATS);
 }
 
 export function getActivities(): Promise<StravaActivity[]> {
   if (USE_MOCK) return import("./mock").then((m) => m.mockActivities);
-  return apiFetch("/api/activities?pages=10");
+  return apiFetch("/api/activities?pages=10", []);
 }
 
 export function getPowerRecords(): Promise<PowerRecords> {
   if (USE_MOCK) return import("./mock").then((m) => m.mockPowerRecords);
-  return apiFetch("/api/power-records?max=20");
+  return apiFetch("/api/power-records?max=20", EMPTY_POWER);
 }
 
 export function getZones(): Promise<ZoneData> {
   if (USE_MOCK) return import("./mock").then((m) => m.mockZones);
-  return apiFetch("/api/zones?max=20");
+  return apiFetch("/api/zones?max=20", EMPTY_ZONES);
 }
+
