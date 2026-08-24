@@ -8,7 +8,7 @@ export function StatsSection() {
   const { data: stats } = useQuery({ queryKey: ["stats"], queryFn: getStats });
   const { data: activities = [] } = useQuery({ queryKey: ["activities"], queryFn: getActivities });
 
-  if (!stats) {
+  if (!stats || activities.length === 0) {
     return (
       <>
         <section className="mb-8">
@@ -24,9 +24,6 @@ export function StatsSection() {
       </>
     );
   }
-
-  const ytd = stats.ytd_ride_totals;
-  const allTime = stats.all_ride_totals;
 
   const now = new Date();
   const thisYearStart = new Date(now.getFullYear(), 0, 1);
@@ -59,6 +56,17 @@ export function StatsSection() {
     elevation_gain: lastYearRides.reduce((sum, a) => sum + a.total_elevation_gain, 0),
   };
 
+  const allRides = activities.filter((a) => {
+    return a.type === "Ride" || a.sport_type === "Ride" || a.type === "VirtualRide";
+  });
+
+  const allTimeFromActivities = {
+    distance: allRides.reduce((sum, a) => sum + a.distance, 0),
+    count: allRides.length,
+    moving_time: allRides.reduce((sum, a) => sum + a.moving_time, 0),
+    elevation_gain: allRides.reduce((sum, a) => sum + a.total_elevation_gain, 0),
+  };
+
   const pct = (curr: number, prev: number) => prev > 0 ? Math.round(((curr - prev) / prev) * 100) : 0;
 
   return (
@@ -76,10 +84,10 @@ export function StatsSection() {
       <section className="mb-8">
         <p className="text-xs font-medium text-text-muted uppercase tracking-wider mb-3 px-1">All time</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatCard title="Distance" value={formatDistance(allTime.distance)} />
-          <StatCard title="Rides" value={allTime.count.toString()} />
-          <StatCard title="Time" value={formatDuration(allTime.moving_time)} />
-          <StatCard title="Elevation" value={formatElevation(allTime.elevation_gain)} />
+          <StatCard title="Distance" value={formatDistance(allTimeFromActivities.distance)} />
+          <StatCard title="Rides" value={allTimeFromActivities.count.toString()} />
+          <StatCard title="Time" value={formatDuration(allTimeFromActivities.moving_time)} />
+          <StatCard title="Elevation" value={formatElevation(allTimeFromActivities.elevation_gain)} />
         </div>
       </section>
     </>
