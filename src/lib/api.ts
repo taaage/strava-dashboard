@@ -63,8 +63,15 @@ export interface PowerRecords {
 }
 
 export interface ZoneData {
-  powerZones: Record<string, number>;
-  hrZones: Record<string, number>;
+  power: ZoneEntry[];
+  hr: ZoneEntry[];
+}
+
+interface ZoneEntry {
+  name: string;
+  seconds: number;
+  hours: number;
+  percentage: number;
 }
 
 async function apiFetch<T>(endpoint: string, fallback: T): Promise<T> {
@@ -97,7 +104,7 @@ const EMPTY_POWER: PowerRecords = {
   "30min": 0, "45min": 0, "60min": 0,
 };
 
-const EMPTY_ZONES: ZoneData = { powerZones: {}, hrZones: {} };
+const EMPTY_ZONES: ZoneData = { power: [], hr: [] };
 
 export function getAthlete(): Promise<StravaAthlete | null> {
   return apiFetch("/api/athlete", null);
