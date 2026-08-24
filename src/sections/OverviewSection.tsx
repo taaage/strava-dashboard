@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { getActivities, getStats } from "../lib/api";
-import { GoalsSection } from "../components/GoalsSection";
+import { GoalsSection as Goals } from "../components/GoalsSection";
 import { YearProgressChart } from "../components/YearProgressChart";
+import { Section } from "../components/layout";
 import { CardPlaceholder } from "../components/CardPlaceholder";
 
 export function OverviewSection() {
@@ -11,22 +12,20 @@ export function OverviewSection() {
   if (!stats || activities.length === 0) {
     return (
       <>
-        <section className="mb-8"><CardPlaceholder height="h-56" /></section>
-        <section className="mb-8"><CardPlaceholder height="h-96" /></section>
+        <Section><CardPlaceholder height="h-56" /></Section>
+        <Section><CardPlaceholder height="h-96" /></Section>
       </>
     );
   }
 
   return (
     <>
-      <section className="mb-8">
-        <p className="text-xs font-medium text-text-muted uppercase tracking-wider mb-3 px-1">Goals</p>
-        <GoalsSection activities={activities} stats={stats} />
-      </section>
-
-      <section className="mb-8">
+      <Section title="Goals">
+        <Goals activities={activities} stats={stats} />
+      </Section>
+      <Section>
         <YearProgressChart activities={activities} />
-      </section>
+      </Section>
     </>
   );
 }
