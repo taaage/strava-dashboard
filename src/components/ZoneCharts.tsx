@@ -7,12 +7,12 @@ interface ZoneChartsProps {
 
 const POWER_ZONE_CONFIG = [
   { min: 0, max: 179, name: "Z1 Recovery", color: "hsl(210, 50%, 70%)" },
-  { min: 180, max: 244, name: "Z2 Endurance", color: "hsl(210, 70%, 55%)" },
-  { min: 245, max: 293, name: "Z3 Tempo", color: "hsl(160, 60%, 45%)" },
-  { min: 294, max: 341, name: "Z4 Threshold", color: "hsl(45, 80%, 55%)" },
-  { min: 342, max: 390, name: "Z5 VO2max", color: "hsl(25, 80%, 55%)" },
-  { min: 391, max: 488, name: "Z6 Anaerobic", color: "hsl(0, 70%, 55%)" },
-  { min: 489, max: Infinity, name: "Z7 Neuromuscular", color: "hsl(280, 65%, 55%)" },
+  { min: 180, max: 235, name: "Z2 Endurance", color: "hsl(210, 70%, 55%)" },
+  { min: 236, max: 309, name: "Z3 Tempo", color: "hsl(160, 60%, 45%)" },
+  { min: 310, max: 344, name: "Z4 Threshold", color: "hsl(45, 80%, 55%)" },
+  { min: 345, max: 399, name: "Z5 VO2max", color: "hsl(25, 80%, 55%)" },
+  { min: 400, max: 446, name: "Z6 Anaerobic", color: "hsl(0, 70%, 55%)" },
+  { min: 447, max: Infinity, name: "Z7 Neuromuscular", color: "hsl(280, 65%, 55%)" },
 ];
 
 const HR_ZONE_CONFIG = [
@@ -30,12 +30,24 @@ function aggregateBucketsToZones(
   const zoneTimes = zoneConfig.map((z) => ({ ...z, time: 0 }));
 
   Object.entries(buckets).forEach(([key, time]) => {
-    const [minStr] = key.split("-");
-    const bucketMin = parseInt(minStr);
-    for (let i = zoneTimes.length - 1; i >= 0; i--) {
-      if (bucketMin >= zoneTimes[i].min) {
-        zoneTimes[i].time += time;
-        break;
+    const parts = key.split("-");
+    const bucketMin = parseInt(parts[0]);
+    const bucketMax = parts[1] === "-1" ? 9999 : parseInt(parts[1]);
+    const bucketRange = bucketMax - bucketMin;
+
+    if (bucketRange <= 0) {
+      // Zero-width bucket (e.g. "0-0"), assign to first zone
+      zoneTimes[0].time += time;
+      return;
+    }
+
+    // Split bucket proportionally across zones it overlaps
+    for (const zone of zoneTimes) {
+      const overlapMin = Math.max(bucketMin, zone.min);
+      const overlapMax = Math.min(bucketMax, zone.max === Infinity ? 9999 : zone.max);
+      if (overlapMin < overlapMax) {
+        const overlapFraction = (overlapMax - overlapMin) / bucketRange;
+        zone.time += time * overlapFraction;
       }
     }
   });
