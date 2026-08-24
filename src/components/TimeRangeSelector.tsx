@@ -2,7 +2,7 @@ export const TIME_RANGES = [
   { label: "7d", days: 7 },
   { label: "30d", days: 30 },
   { label: "90d", days: 90 },
-  { label: "6m", days: 180 },
+  { label: "6m", days: 185 },
   { label: "1y", days: 365 },
 ];
 
