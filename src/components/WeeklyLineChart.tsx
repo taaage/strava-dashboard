@@ -22,7 +22,9 @@ function getWeeklyData(activities: StravaActivity[], days: number) {
   rides.forEach((ride) => {
     const date = new Date(ride.start_date_local);
     const startOfWeek = new Date(date);
-    startOfWeek.setDate(date.getDate() - date.getDay() + 1);
+    const day = date.getDay();
+    const mondayOffset = day === 0 ? -6 : 1 - day;
+    startOfWeek.setDate(date.getDate() + mondayOffset);
     const key = startOfWeek.toISOString().split("T")[0];
 
     const existing = weekMap.get(key) || 0;
