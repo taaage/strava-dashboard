@@ -1,5 +1,4 @@
 const API_BASE = import.meta.env.VITE_API_BASE ?? "https://api.tiggenilsson.se";
-const USE_MOCK = import.meta.env.DEV && !import.meta.env.VITE_API_BASE;
 
 export interface StravaAthlete {
   id: number;
@@ -101,27 +100,21 @@ const EMPTY_POWER: PowerRecords = {
 const EMPTY_ZONES: ZoneData = { powerZones: {}, hrZones: {} };
 
 export function getAthlete(): Promise<StravaAthlete | null> {
-  if (USE_MOCK) return import("./mock").then((m) => m.mockAthlete);
   return apiFetch("/api/athlete", null);
 }
 
 export function getStats(): Promise<StravaStats> {
-  if (USE_MOCK) return import("./mock").then((m) => m.mockStats);
   return apiFetch("/api/stats", EMPTY_STATS);
 }
 
 export function getActivities(): Promise<StravaActivity[]> {
-  if (USE_MOCK) return import("./mock").then((m) => m.mockActivities);
-  return apiFetch("/api/activities?pages=10", []);
+  return apiFetch("/api/activities", []);
 }
 
 export function getPowerRecords(): Promise<PowerRecords> {
-  if (USE_MOCK) return import("./mock").then((m) => m.mockPowerRecords);
-  return apiFetch("/api/power-records?max=20", EMPTY_POWER);
+  return apiFetch("/api/power-records", EMPTY_POWER);
 }
 
 export function getZones(): Promise<ZoneData> {
-  if (USE_MOCK) return import("./mock").then((m) => m.mockZones);
-  return apiFetch("/api/zones?max=20", EMPTY_ZONES);
+  return apiFetch("/api/zones", EMPTY_ZONES);
 }
-
