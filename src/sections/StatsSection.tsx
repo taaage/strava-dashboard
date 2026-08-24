@@ -29,8 +29,22 @@ export function StatsSection() {
   const allTime = stats.all_ride_totals;
 
   const now = new Date();
+  const thisYearStart = new Date(now.getFullYear(), 0, 1);
   const lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
   const lastYearSamePoint = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+
+  const thisYearRides = activities.filter((a) => {
+    const isRide = a.type === "Ride" || a.sport_type === "Ride" || a.type === "VirtualRide";
+    const date = new Date(a.start_date_local);
+    return isRide && date >= thisYearStart;
+  });
+
+  const ytdFromActivities = {
+    distance: thisYearRides.reduce((sum, a) => sum + a.distance, 0),
+    count: thisYearRides.length,
+    moving_time: thisYearRides.reduce((sum, a) => sum + a.moving_time, 0),
+    elevation_gain: thisYearRides.reduce((sum, a) => sum + a.total_elevation_gain, 0),
+  };
 
   const lastYearRides = activities.filter((a) => {
     const isRide = a.type === "Ride" || a.sport_type === "Ride" || a.type === "VirtualRide";
@@ -52,10 +66,10 @@ export function StatsSection() {
       <section className="mb-8">
         <p className="text-xs font-medium text-text-muted uppercase tracking-wider mb-3 px-1">This year</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatCard title="Distance" value={formatDistance(ytd.distance)} comparison={{ value: pct(ytd.distance, ly.distance), unit: "%", isPercentage: true }} />
-          <StatCard title="Rides" value={ytd.count.toString()} comparison={{ value: ytd.count - ly.count, unit: "rides" }} />
-          <StatCard title="Time" value={formatDuration(ytd.moving_time)} comparison={{ value: pct(ytd.moving_time, ly.moving_time), unit: "%", isPercentage: true }} />
-          <StatCard title="Elevation" value={formatElevation(ytd.elevation_gain)} comparison={{ value: pct(ytd.elevation_gain, ly.elevation_gain), unit: "%", isPercentage: true }} />
+          <StatCard title="Distance" value={formatDistance(ytdFromActivities.distance)} comparison={{ value: pct(ytdFromActivities.distance, ly.distance), unit: "%", isPercentage: true }} />
+          <StatCard title="Rides" value={ytdFromActivities.count.toString()} comparison={{ value: ytdFromActivities.count - ly.count, unit: "rides" }} />
+          <StatCard title="Time" value={formatDuration(ytdFromActivities.moving_time)} comparison={{ value: pct(ytdFromActivities.moving_time, ly.moving_time), unit: "%", isPercentage: true }} />
+          <StatCard title="Elevation" value={formatElevation(ytdFromActivities.elevation_gain)} comparison={{ value: pct(ytdFromActivities.elevation_gain, ly.elevation_gain), unit: "%", isPercentage: true }} />
         </div>
       </section>
 
