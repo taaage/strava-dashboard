@@ -1,32 +1,32 @@
 import {
-  BarChart,
   Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
+  BarChart,
   CartesianGrid,
   Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
 import { StravaActivity } from "../../api/api";
 import { ChartCard, useTimeRange } from "../../shared/layout";
 
 interface WeeklyTSSChartProps {
   activities: StravaActivity[];
+  ftp: number;
 }
 
-const FTP = 325;
-
-function calculateTSS(activity: StravaActivity): number {
-  if (!activity.average_watts || activity.average_watts === 0) return 0;
+function calculateTSS(activity: StravaActivity, ftp: number): number {
+  if (!activity.average_watts || activity.average_watts === 0 || ftp === 0)
+    return 0;
   const np = activity.average_watts * 1.05;
-  const intensityFactor = np / FTP;
+  const intensityFactor = np / ftp;
   return Math.round(
-    ((activity.moving_time * np * intensityFactor) / (FTP * 3600)) * 100,
+    ((activity.moving_time * np * intensityFactor) / (ftp * 3600)) * 100,
   );
 }
 
-function getWeeklyTSS(activities: StravaActivity[], days: number) {
+function getWeeklyTSS(activities: StravaActivity[], days: number, ftp: number) {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - days);
 
@@ -47,7 +47,7 @@ function getWeeklyTSS(activities: StravaActivity[], days: number) {
     const mondayOffset = day === 0 ? -6 : 1 - day;
     startOfWeek.setDate(date.getDate() + mondayOffset);
     const key = startOfWeek.toISOString().split("T")[0];
-    weekMap.set(key, (weekMap.get(key) || 0) + calculateTSS(ride));
+    weekMap.set(key, (weekMap.get(key) || 0) + calculateTSS(ride, ftp));
   });
 
   const entries = Array.from(weekMap.entries())
@@ -71,14 +71,14 @@ function getWeeklyTSS(activities: StravaActivity[], days: number) {
   return entries.map((e) => ({ ...e, intensity: e.tss / maxTSS }));
 }
 
-export function WeeklyTSSChart({ activities }: WeeklyTSSChartProps) {
+export function WeeklyTSSChart({ activities, ftp }: WeeklyTSSChartProps) {
   const timeRange = useTimeRange(90);
-  const data = getWeeklyTSS(activities, timeRange.days);
+  const data = getWeeklyTSS(activities, timeRange.days, ftp);
 
   return (
     <ChartCard
       title="Weekly TSS"
-      subtitle={`Training Stress Score (FTP: ${FTP}W)`}
+      subtitle={`Training Stress Score (FTP: ${ftp}W)`}
       timeRange={timeRange}
     >
       <ResponsiveContainer width="100%" height="100%">

@@ -7,6 +7,10 @@ export interface StravaAthlete {
   profile: string;
   city: string;
   country: string;
+  weight: number;
+  ftp: number;
+  sex: string;
+  bikes: { id: string; name: string; distance: number }[];
 }
 
 export interface StravaActivity {

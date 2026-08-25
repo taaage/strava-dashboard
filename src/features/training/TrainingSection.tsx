@@ -1,16 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { getActivities } from "../../api/api";
-import { WeeklyAreaChart } from "./WeeklyDistanceChart";
-import { EfficiencyAreaChart } from "./EfficiencyChart";
-import { FitnessChart } from "./FitnessChart";
-import { WeeklyTSSChart } from "./WeeklyTSSChart";
-import { Section } from "../../shared/layout";
+import { getActivities, getAthlete } from "../../api/api";
 import { CardPlaceholder } from "../../shared/CardPlaceholder";
+import { Section } from "../../shared/layout";
+import { EfficiencyAreaChart } from "./EfficiencyChart";
+import { WeeklyAreaChart } from "./WeeklyDistanceChart";
+import { WeeklyTSSChart } from "./WeeklyTSSChart";
 
 export function TrainingSection() {
   const { data: activities = [] } = useQuery({
     queryKey: ["activities"],
     queryFn: getActivities,
+  });
+  const { data: athlete } = useQuery({
+    queryKey: ["athlete"],
+    queryFn: getAthlete,
   });
 
   if (activities.length === 0) {
@@ -25,6 +28,8 @@ export function TrainingSection() {
     );
   }
 
+  const ftp = athlete?.ftp ?? 0;
+
   return (
     <>
       <Section>
@@ -35,11 +40,11 @@ export function TrainingSection() {
       </Section>
 
       {/* <Section>
-        <FitnessChart activities={activities} />
+        <FitnessChart activities={activities} ftp={ftp} />
       </Section> */}
 
       <Section>
-        <WeeklyTSSChart activities={activities} />
+        <WeeklyTSSChart activities={activities} ftp={ftp} />
       </Section>
     </>
   );

@@ -1,35 +1,35 @@
 import {
-  AreaChart,
   Area,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
   CartesianGrid,
   ComposedChart,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
 import { StravaActivity } from "../../api/api";
 import { ChartCard, useTimeRange } from "../../shared/layout";
 
 interface FitnessChartProps {
   activities: StravaActivity[];
+  ftp: number;
 }
 
-const FTP = 325;
-const CTL_DAYS = 42;
-const ATL_DAYS = 7;
-
-function calculateTSS(activity: StravaActivity): number {
-  if (!activity.average_watts || activity.average_watts === 0) return 0;
+function calculateTSS(activity: StravaActivity, ftp: number): number {
+  if (!activity.average_watts || activity.average_watts === 0 || ftp === 0)
+    return 0;
   const np = activity.average_watts * 1.05;
-  const intensityFactor = np / FTP;
+  const intensityFactor = np / ftp;
   return Math.round(
-    ((activity.moving_time * np * intensityFactor) / (FTP * 3600)) * 100,
+    ((activity.moving_time * np * intensityFactor) / (ftp * 3600)) * 100,
   );
 }
 
-function calculateFitnessData(activities: StravaActivity[]) {
+const CTL_DAYS = 42;
+const ATL_DAYS = 7;
+
+function calculateFitnessData(activities: StravaActivity[], ftp: number) {
   const rides = activities
     .filter(
       (a) =>
@@ -51,7 +51,10 @@ function calculateFitnessData(activities: StravaActivity[]) {
 
   rides.forEach((ride) => {
     const dateKey = new Date(ride.start_date_local).toISOString().split("T")[0];
-    dailyTSS.set(dateKey, (dailyTSS.get(dateKey) || 0) + calculateTSS(ride));
+    dailyTSS.set(
+      dateKey,
+      (dailyTSS.get(dateKey) || 0) + calculateTSS(ride, ftp),
+    );
   });
 
   const data: {
@@ -85,15 +88,15 @@ function calculateFitnessData(activities: StravaActivity[]) {
   return data;
 }
 
-export function FitnessChart({ activities }: FitnessChartProps) {
+export function FitnessChart({ activities, ftp }: FitnessChartProps) {
   const timeRange = useTimeRange(90);
-  const allData = calculateFitnessData(activities);
+  const allData = calculateFitnessData(activities, ftp);
   const data = allData.slice(-timeRange.days);
 
   return (
     <ChartCard
       title="Fitness & Form"
-      subtitle={`Based on TSS (FTP: ${FTP}W)`}
+      subtitle={`Based on TSS (FTP: ${ftp}W)`}
       height="h-72"
       timeRange={timeRange}
     >
