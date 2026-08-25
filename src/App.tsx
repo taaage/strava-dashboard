@@ -3,6 +3,7 @@ import { getAthlete } from "./api/api";
 import { OverviewSection } from "./features/overview/OverviewSection";
 import { StatsSection } from "./features/stats/StatsSection";
 import { PowerSection } from "./features/power/PowerSection";
+import { StreamsSection } from "./features/streams/StreamsSection";
 import { TrainingSection } from "./features/training/TrainingSection";
 import { ZonesSection } from "./features/zones/ZonesSection";
 import { ActivitiesSection } from "./features/activities/ActivitiesSection";
@@ -25,6 +26,7 @@ export default function App() {
       <OverviewSection />
       <StatsSection />
       <PowerSection />
+      <StreamsSection />
       <TrainingSection />
       <ZonesSection />
       <ActivitiesSection />

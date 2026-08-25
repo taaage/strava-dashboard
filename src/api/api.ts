@@ -125,3 +125,16 @@ export function getPowerRecords(): Promise<PowerRecords> {
 export function getZones(): Promise<ZoneData> {
   return apiFetch("/api/zones", EMPTY_ZONES);
 }
+
+export interface RideStream {
+  activityId: number;
+  date: string;
+  name: string;
+  watts: number[];
+  heartrate: number[] | null;
+  cadence: number[] | null;
+}
+
+export function getRideStreams(): Promise<RideStream[]> {
+  return apiFetch("/api/ride-streams", []);
+}
