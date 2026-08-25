@@ -1,12 +1,32 @@
 import { useState } from "react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { StravaActivity } from "../../lib/api";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { StravaActivity } from "../../api/api";
 
 interface YearProgressChartProps {
   activities: StravaActivity[];
 }
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 const YEARLY_GOAL = 10000;
 
 const YEAR_COLORS = [
@@ -18,7 +38,10 @@ const YEAR_COLORS = [
   "#8FD4B4",
 ];
 
-function getCumulativeByMonth(activities: StravaActivity[], year: number): (number | null)[] {
+function getCumulativeByMonth(
+  activities: StravaActivity[],
+  year: number,
+): (number | null)[] {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
@@ -27,7 +50,10 @@ function getCumulativeByMonth(activities: StravaActivity[], year: number): (numb
 
   activities
     .filter((a) => {
-      const isRide = a.type === "Ride" || a.sport_type === "Ride" || a.type === "VirtualRide";
+      const isRide =
+        a.type === "Ride" ||
+        a.sport_type === "Ride" ||
+        a.type === "VirtualRide";
       const date = new Date(a.start_date_local);
       return isRide && date.getFullYear() === year;
     })
@@ -52,7 +78,8 @@ function getCumulativeByMonth(activities: StravaActivity[], year: number): (numb
 function getAvailableYears(activities: StravaActivity[]): number[] {
   const years = new Set<number>();
   activities.forEach((a) => {
-    const isRide = a.type === "Ride" || a.sport_type === "Ride" || a.type === "VirtualRide";
+    const isRide =
+      a.type === "Ride" || a.sport_type === "Ride" || a.type === "VirtualRide";
     if (isRide) years.add(new Date(a.start_date_local).getFullYear());
   });
   return Array.from(years).sort((a, b) => b - a);
@@ -62,15 +89,20 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
   const now = new Date();
   const thisYear = now.getFullYear();
   const availableYears = getAvailableYears(activities);
-  const [selectedYears, setSelectedYears] = useState<number[]>([thisYear, thisYear - 1]);
+  const [selectedYears, setSelectedYears] = useState<number[]>([
+    thisYear,
+    thisYear - 1,
+  ]);
 
   const toggleYear = (year: number) => {
     setSelectedYears((prev) =>
-      prev.includes(year) ? prev.filter((y) => y !== year) : [...prev, year]
+      prev.includes(year) ? prev.filter((y) => y !== year) : [...prev, year],
     );
   };
 
-  const goalPace = MONTHS.map((_, i) => Math.round((YEARLY_GOAL / 12) * (i + 1)));
+  const goalPace = MONTHS.map((_, i) =>
+    Math.round((YEARLY_GOAL / 12) * (i + 1)),
+  );
 
   const data = MONTHS.map((month, i) => {
     const point: any = { month, goal: goalPace[i] };
@@ -87,8 +119,12 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
     <div className="bg-surface-card rounded-3xl p-8 border border-surface-border">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-semibold text-text-primary mb-1">Year Progress</h2>
-          <p className="text-sm text-text-muted">Cumulative distance toward 10,000 km</p>
+          <h2 className="text-lg font-semibold text-text-primary mb-1">
+            Year Progress
+          </h2>
+          <p className="text-sm text-text-muted">
+            Cumulative distance toward 10,000 km
+          </p>
         </div>
         <div className="flex gap-1 flex-wrap">
           {availableYears.map((year) => (
@@ -109,24 +145,54 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
-            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 11 }} dy={8} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} dx={-4} domain={[0, 10000]} />
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "#71717a", fontSize: 11 }}
+              dy={8}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "#71717a", fontSize: 11 }}
+              tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+              dx={-4}
+              domain={[0, 10000]}
+            />
             <Tooltip
               content={({ active, payload, label }) => {
                 if (!active || !payload?.length) return null;
                 return (
                   <div className="bg-surface-muted rounded-lg px-3 py-2 border border-surface-border shadow-xl">
                     <p className="text-xs text-text-secondary mb-1">{label}</p>
-                    {payload.map((entry: any) => entry.value !== null && (
-                      <p key={entry.dataKey} className="text-sm" style={{ color: entry.color }}>
-                        {entry.name}: {Math.round(entry.value).toLocaleString("en-US")} km
-                      </p>
-                    ))}
+                    {payload.map(
+                      (entry: any) =>
+                        entry.value !== null && (
+                          <p
+                            key={entry.dataKey}
+                            className="text-sm"
+                            style={{ color: entry.color }}
+                          >
+                            {entry.name}:{" "}
+                            {Math.round(entry.value).toLocaleString("en-US")} km
+                          </p>
+                        ),
+                    )}
                   </div>
                 );
               }}
             />
-            <Line type="monotone" dataKey="goal" stroke="#71717a" strokeWidth={2} strokeDasharray="6 4" dot={false} name="Goal pace" connectNulls />
+            <Line
+              type="monotone"
+              dataKey="goal"
+              stroke="#71717a"
+              strokeWidth={2}
+              strokeDasharray="6 4"
+              dot={false}
+              name="Goal pace"
+              connectNulls
+            />
             {sortedSelected.map((year, i) => (
               <Line
                 key={year}
@@ -145,11 +211,16 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
       <div className="flex items-center justify-center gap-4 mt-4 text-xs text-text-muted flex-wrap">
         {sortedSelected.map((year, i) => (
           <span key={year} className="flex items-center gap-1.5">
-            <span className="w-3 h-0.5 rounded inline-block" style={{ backgroundColor: YEAR_COLORS[i % YEAR_COLORS.length] }} /> {year}
+            <span
+              className="w-3 h-0.5 rounded inline-block"
+              style={{ backgroundColor: YEAR_COLORS[i % YEAR_COLORS.length] }}
+            />{" "}
+            {year}
           </span>
         ))}
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-0.5 border-t-2 border-dashed border-[#71717a] inline-block" /> Goal
+          <span className="w-3 h-0.5 border-t-2 border-dashed border-[#71717a] inline-block" />{" "}
+          Goal
         </span>
       </div>
     </div>

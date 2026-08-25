@@ -1,4 +1,4 @@
-import { StravaActivity, StravaStats } from "../../lib/api";
+import { StravaActivity, StravaStats } from "../../api/api";
 import { RadialProgress } from "./RadialProgress";
 
 interface GoalsSectionProps {
@@ -16,7 +16,10 @@ function getThisWeekDistance(activities: StravaActivity[]): number {
 
   return activities
     .filter((a) => {
-      const isRide = a.type === "Ride" || a.sport_type === "Ride" || a.type === "VirtualRide";
+      const isRide =
+        a.type === "Ride" ||
+        a.sport_type === "Ride" ||
+        a.type === "VirtualRide";
       const actDate = new Date(a.start_date_local);
       return isRide && actDate >= monday;
     })
@@ -29,7 +32,10 @@ function getThisMonthDistance(activities: StravaActivity[]): number {
 
   return activities
     .filter((a) => {
-      const isRide = a.type === "Ride" || a.sport_type === "Ride" || a.type === "VirtualRide";
+      const isRide =
+        a.type === "Ride" ||
+        a.sport_type === "Ride" ||
+        a.type === "VirtualRide";
       const actDate = new Date(a.start_date_local);
       return isRide && actDate >= firstOfMonth;
     })

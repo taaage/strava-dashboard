@@ -1,5 +1,15 @@
-import { AreaChart, Area, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ComposedChart } from "recharts";
-import { StravaActivity } from "../../lib/api";
+import {
+  AreaChart,
+  Area,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  ComposedChart,
+} from "recharts";
+import { StravaActivity } from "../../api/api";
 import { ChartCard, useTimeRange } from "../../shared/layout";
 
 interface FitnessChartProps {
@@ -14,13 +24,24 @@ function calculateTSS(activity: StravaActivity): number {
   if (!activity.average_watts || activity.average_watts === 0) return 0;
   const np = activity.average_watts * 1.05;
   const intensityFactor = np / FTP;
-  return Math.round((activity.moving_time * np * intensityFactor) / (FTP * 3600) * 100);
+  return Math.round(
+    ((activity.moving_time * np * intensityFactor) / (FTP * 3600)) * 100,
+  );
 }
 
 function calculateFitnessData(activities: StravaActivity[]) {
   const rides = activities
-    .filter((a) => a.type === "Ride" || a.sport_type === "Ride" || a.type === "VirtualRide")
-    .sort((a, b) => new Date(a.start_date_local).getTime() - new Date(b.start_date_local).getTime());
+    .filter(
+      (a) =>
+        a.type === "Ride" ||
+        a.sport_type === "Ride" ||
+        a.type === "VirtualRide",
+    )
+    .sort(
+      (a, b) =>
+        new Date(a.start_date_local).getTime() -
+        new Date(b.start_date_local).getTime(),
+    );
 
   if (rides.length === 0) return [];
 
@@ -33,7 +54,13 @@ function calculateFitnessData(activities: StravaActivity[]) {
     dailyTSS.set(dateKey, (dailyTSS.get(dateKey) || 0) + calculateTSS(ride));
   });
 
-  const data: { date: string; fitness: number; fatigue: number; form: number; tss: number }[] = [];
+  const data: {
+    date: string;
+    fitness: number;
+    fatigue: number;
+    form: number;
+    tss: number;
+  }[] = [];
   let ctl = 0;
   let atl = 0;
 
@@ -44,7 +71,10 @@ function calculateFitnessData(activities: StravaActivity[]) {
     ctl = ctl + (tss - ctl) * (1 / CTL_DAYS);
     atl = atl + (tss - atl) * (1 / ATL_DAYS);
     data.push({
-      date: current.toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
+      date: current.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+      }),
       fitness: Math.round(ctl),
       fatigue: Math.round(atl),
       form: Math.round(ctl - atl),
@@ -61,22 +91,59 @@ export function FitnessChart({ activities }: FitnessChartProps) {
   const data = allData.slice(-timeRange.days);
 
   return (
-    <ChartCard title="Fitness & Form" subtitle={`Based on TSS (FTP: ${FTP}W)`} height="h-72" timeRange={timeRange}>
+    <ChartCard
+      title="Fitness & Form"
+      subtitle={`Based on TSS (FTP: ${FTP}W)`}
+      height="h-72"
+      timeRange={timeRange}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data}>
           <defs>
             <linearGradient id="colorFitness" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.05} />
+              <stop
+                offset="5%"
+                stopColor="hsl(221, 83%, 53%)"
+                stopOpacity={0.3}
+              />
+              <stop
+                offset="95%"
+                stopColor="hsl(221, 83%, 53%)"
+                stopOpacity={0.05}
+              />
             </linearGradient>
             <linearGradient id="colorFatigue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="hsl(0, 70%, 55%)" stopOpacity={0.2} />
-              <stop offset="95%" stopColor="hsl(0, 70%, 55%)" stopOpacity={0.02} />
+              <stop
+                offset="5%"
+                stopColor="hsl(0, 70%, 55%)"
+                stopOpacity={0.2}
+              />
+              <stop
+                offset="95%"
+                stopColor="hsl(0, 70%, 55%)"
+                stopOpacity={0.02}
+              />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-          <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 10 }} dy={8} interval={Math.max(0, Math.floor(data.length / 7))} />
-          <YAxis axisLine={false} tickLine={false} tick={{ fill: "#71717a", fontSize: 11 }} dx={-4} />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="#27272a"
+            vertical={false}
+          />
+          <XAxis
+            dataKey="date"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "#71717a", fontSize: 10 }}
+            dy={8}
+            interval={Math.max(0, Math.floor(data.length / 7))}
+          />
+          <YAxis
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "#71717a", fontSize: 11 }}
+            dx={-4}
+          />
           <Tooltip
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null;
@@ -84,17 +151,48 @@ export function FitnessChart({ activities }: FitnessChartProps) {
               return (
                 <div className="bg-surface-muted rounded-lg px-3 py-2 border border-surface-border shadow-xl">
                   <p className="text-xs text-text-secondary mb-1">{d?.date}</p>
-                  <p className="text-sm text-[hsl(221,83%,53%)]">Fitness (CTL): {d?.fitness}</p>
-                  <p className="text-sm text-[hsl(0,70%,55%)]">Fatigue (ATL): {d?.fatigue}</p>
-                  <p className={`text-sm font-medium ${d?.form >= 0 ? "text-green-400" : "text-orange-400"}`}>Form (TSB): {d?.form}</p>
-                  {d?.tss > 0 && <p className="text-xs text-text-muted mt-1">TSS: {d?.tss}</p>}
+                  <p className="text-sm text-[hsl(221,83%,53%)]">
+                    Fitness (CTL): {d?.fitness}
+                  </p>
+                  <p className="text-sm text-[hsl(0,70%,55%)]">
+                    Fatigue (ATL): {d?.fatigue}
+                  </p>
+                  <p
+                    className={`text-sm font-medium ${d?.form >= 0 ? "text-green-400" : "text-orange-400"}`}
+                  >
+                    Form (TSB): {d?.form}
+                  </p>
+                  {d?.tss > 0 && (
+                    <p className="text-xs text-text-muted mt-1">
+                      TSS: {d?.tss}
+                    </p>
+                  )}
                 </div>
               );
             }}
           />
-          <Area type="monotone" dataKey="fitness" stroke="hsl(221, 83%, 53%)" strokeWidth={2.5} fill="url(#colorFitness)" />
-          <Area type="monotone" dataKey="fatigue" stroke="hsl(0, 70%, 55%)" strokeWidth={1.5} fill="url(#colorFatigue)" strokeDasharray="4 2" />
-          <Line type="monotone" dataKey="form" stroke="hsl(160, 60%, 45%)" strokeWidth={2} dot={false} />
+          <Area
+            type="monotone"
+            dataKey="fitness"
+            stroke="hsl(221, 83%, 53%)"
+            strokeWidth={2.5}
+            fill="url(#colorFitness)"
+          />
+          <Area
+            type="monotone"
+            dataKey="fatigue"
+            stroke="hsl(0, 70%, 55%)"
+            strokeWidth={1.5}
+            fill="url(#colorFatigue)"
+            strokeDasharray="4 2"
+          />
+          <Line
+            type="monotone"
+            dataKey="form"
+            stroke="hsl(160, 60%, 45%)"
+            strokeWidth={2}
+            dot={false}
+          />
         </ComposedChart>
       </ResponsiveContainer>
     </ChartCard>

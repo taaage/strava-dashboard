@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAthlete } from "./lib/api";
+import { getAthlete } from "./api/api";
 import { OverviewSection } from "./features/overview/OverviewSection";
 import { StatsSection } from "./features/stats/StatsSection";
 import { PowerSection } from "./features/power/PowerSection";

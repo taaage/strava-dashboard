@@ -7,7 +7,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { StravaActivity } from "../../lib/api";
+import { StravaActivity } from "../../api/api";
 import {
   isRide,
   getMondayKey,

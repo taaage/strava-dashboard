@@ -1,7 +1,9 @@
-import { StravaActivity } from "./api";
+import { StravaActivity } from "../api/api";
 
 export function isRide(a: StravaActivity) {
-  return a.type === "Ride" || a.sport_type === "Ride" || a.type === "VirtualRide";
+  return (
+    a.type === "Ride" || a.sport_type === "Ride" || a.type === "VirtualRide"
+  );
 }
 
 export function getMondayKey(dateStr: string): string {
@@ -15,11 +17,20 @@ export function getMondayKey(dateStr: string): string {
 
 export function getWeekLabel(weekKey: string) {
   const parts = weekKey.split("-");
-  const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  const date = new Date(
+    parseInt(parts[0]),
+    parseInt(parts[1]) - 1,
+    parseInt(parts[2]),
+  );
   const sunday = new Date(date);
   sunday.setDate(date.getDate() + 6);
   const startOfYear = new Date(date.getFullYear(), 0, 1);
-  const weekNum = Math.ceil(((date.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7);
+  const weekNum = Math.ceil(
+    ((date.getTime() - startOfYear.getTime()) / 86400000 +
+      startOfYear.getDay() +
+      1) /
+      7,
+  );
   const dateRange = `${date.toLocaleDateString("en-GB", { day: "numeric", month: "short" })} – ${sunday.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`;
   return { week: `W${weekNum}`, dateRange };
 }

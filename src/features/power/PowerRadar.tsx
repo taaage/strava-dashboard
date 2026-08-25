@@ -1,5 +1,12 @@
-import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip } from "recharts";
-import { type PowerRecords } from "../../lib/api";
+import {
+  PolarAngleAxis,
+  PolarGrid,
+  Radar,
+  RadarChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
+import { type PowerRecords } from "../../api/api";
 
 interface PowerRadarProps {
   records: PowerRecords;
@@ -42,24 +49,36 @@ const ALL_TIME: Record<keyof PowerRecords, number> = {
 };
 
 export function PowerRadar({ records }: PowerRadarProps) {
-  const chartData = (Object.keys(REFERENCE) as (keyof PowerRecords)[]).map((key) => ({
-    effort: key,
-    watts: records[key],
-    allTimeWatts: ALL_TIME[key],
-    reference: REFERENCE[key],
-    normalized: Math.round((records[key] / REFERENCE[key]) * 100),
-    allTimeNormalized: ALL_TIME[key] > 0 ? Math.round((ALL_TIME[key] / REFERENCE[key]) * 100) : null,
-  }));
+  const chartData = (Object.keys(REFERENCE) as (keyof PowerRecords)[]).map(
+    (key) => ({
+      effort: key,
+      watts: records[key],
+      allTimeWatts: ALL_TIME[key],
+      reference: REFERENCE[key],
+      normalized: Math.round((records[key] / REFERENCE[key]) * 100),
+      allTimeNormalized:
+        ALL_TIME[key] > 0
+          ? Math.round((ALL_TIME[key] / REFERENCE[key]) * 100)
+          : null,
+    }),
+  );
 
   return (
     <div className="bg-surface-card rounded-3xl p-8 border border-surface-border">
-      <h2 className="text-lg font-semibold text-text-primary mb-1">Power Records</h2>
-      <p className="text-sm text-text-muted mb-4">Best effort last 20 rides - category B references</p>
+      <h2 className="text-lg font-semibold text-text-primary mb-1">
+        Power Records
+      </h2>
+      <p className="text-sm text-text-muted mb-4">
+        Best effort last 20 rides - category B references
+      </p>
       <div className="h-[350px]">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={chartData} cx="50%" cy="50%" outerRadius="70%">
             <PolarGrid stroke="#27272a" />
-            <PolarAngleAxis dataKey="effort" tick={{ fill: "#a1a1aa", fontSize: 10 }} />
+            <PolarAngleAxis
+              dataKey="effort"
+              tick={{ fill: "#a1a1aa", fontSize: 10 }}
+            />
             <Tooltip
               cursor={false}
               content={({ active, payload }) => {
@@ -69,14 +88,25 @@ export function PowerRadar({ records }: PowerRadarProps) {
                 const diff = data?.watts - data?.reference;
                 return (
                   <div className="bg-surface-muted rounded-lg px-3 py-2 border border-surface-border shadow-xl">
-                    <p className="text-xs text-text-secondary mb-1">{data?.effort}</p>
-                    <p className="text-sm font-medium text-white">Current: {data?.watts}W</p>
+                    <p className="text-xs text-text-secondary mb-1">
+                      {data?.effort}
+                    </p>
+                    <p className="text-sm font-medium text-white">
+                      Current: {data?.watts}W
+                    </p>
                     {data?.allTimeWatts > 0 && (
-                      <p className="text-sm text-[hsl(280,65%,60%)]">All-time: {data?.allTimeWatts}W</p>
+                      <p className="text-sm text-[hsl(280,65%,60%)]">
+                        All-time: {data?.allTimeWatts}W
+                      </p>
                     )}
-                    <p className="text-xs text-text-secondary mt-1">Cat B: {data?.reference}W</p>
-                    <p className={`text-xs font-medium ${diff >= 0 ? "text-green-400" : "text-red-400"}`}>
-                      {diff >= 0 ? "+" : ""}{diff}W ({pct}%)
+                    <p className="text-xs text-text-secondary mt-1">
+                      Cat B: {data?.reference}W
+                    </p>
+                    <p
+                      className={`text-xs font-medium ${diff >= 0 ? "text-green-400" : "text-red-400"}`}
+                    >
+                      {diff >= 0 ? "+" : ""}
+                      {diff}W ({pct}%)
                     </p>
                   </div>
                 );
@@ -107,7 +137,9 @@ export function PowerRadar({ records }: PowerRadarProps) {
       <div className="grid grid-cols-7 gap-2 mt-4 text-center">
         {chartData.map((d) => (
           <div key={d.effort}>
-            <p className="text-base font-semibold text-text-primary">{d.watts}</p>
+            <p className="text-base font-semibold text-text-primary">
+              {d.watts}
+            </p>
             <p className="text-xs text-text-muted">{d.effort}</p>
           </div>
         ))}
