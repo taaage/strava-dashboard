@@ -13,13 +13,27 @@ interface ActivityFiltersProps {
   hasFilters: boolean;
 }
 
-const FILTERS: { key: ActivityFilter; label: string; icon?: string; logo?: boolean }[] = [
+const FILTERS: {
+  key: ActivityFilter;
+  label: string;
+  icon?: string;
+  logo?: boolean;
+}[] = [
   { key: "outdoor", label: "Outdoor", icon: "🛣️" },
   { key: "indoor", label: "Indoor", logo: true },
   { key: "races", label: "Races", icon: "🏁" },
 ];
 
-export function ActivityFilters({ filter, onFilterChange, from, to, onFromChange, onToChange, onClear, hasFilters }: ActivityFiltersProps) {
+export function ActivityFilters({
+  filter,
+  onFilterChange,
+  from,
+  to,
+  onFromChange,
+  onToChange,
+  onClear,
+  hasFilters,
+}: ActivityFiltersProps) {
   return (
     <div className="flex items-center gap-2 text-xs">
       {FILTERS.map(({ key, label, icon, logo }) => (
@@ -37,17 +51,20 @@ export function ActivityFilters({ filter, onFilterChange, from, to, onFromChange
         type="date"
         value={from}
         onChange={(e) => onFromChange(e.target.value)}
-        className="bg-surface-muted border border-surface-border rounded-lg px-2 py-1.5 text-text-primary"
+        className="bg-surface-muted border border-surface-border rounded-lg px-2 py-1.5 text-text-primary [color-scheme:dark]"
       />
       <span className="text-text-muted">–</span>
       <input
         type="date"
         value={to}
         onChange={(e) => onToChange(e.target.value)}
-        className="bg-surface-muted border border-surface-border rounded-lg px-2 py-1.5 text-text-primary"
+        className="bg-surface-muted border border-surface-border rounded-lg px-2 py-1.5 text-text-primary [color-scheme:dark]"
       />
       {hasFilters && (
-        <button onClick={onClear} className="text-text-muted hover:text-text-primary px-2">
+        <button
+          onClick={onClear}
+          className="text-text-muted hover:text-text-primary px-2"
+        >
           ✕
         </button>
       )}
