@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, LabelList } from "recharts";
-import { ZoneData } from "../lib/api";
+import { ZoneData } from "../../lib/api";
 
 interface ZoneChartsProps {
   zones: ZoneData;

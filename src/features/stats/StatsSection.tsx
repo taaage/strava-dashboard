@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { getStats, getActivities } from "../lib/api";
-import { formatDistance, formatDuration, formatElevation } from "../lib/utils";
-import { StatCard } from "../components/StatCard";
-import { CardPlaceholder } from "../components/CardPlaceholder";
-import { Section, StatsGrid } from "../components/layout";
+import { getStats, getActivities } from "../../lib/api";
+import { formatDistance, formatDuration, formatElevation } from "../../lib/utils";
+import { StatCard } from "../../shared/StatCard";
+import { CardPlaceholder } from "../../shared/CardPlaceholder";
+import { Section, StatsGrid } from "../../shared/layout";
 
 export function StatsSection() {
   const { data: stats } = useQuery({ queryKey: ["stats"], queryFn: getStats });

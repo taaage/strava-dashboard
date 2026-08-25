@@ -1,5 +1,5 @@
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip } from "recharts";
-import { type PowerRecords } from "../lib/api";
+import { type PowerRecords } from "../../lib/api";
 
 interface PowerRadarProps {
   records: PowerRecords;

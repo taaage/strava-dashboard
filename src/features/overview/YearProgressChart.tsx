@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { StravaActivity } from "../lib/api";
+import { StravaActivity } from "../../lib/api";
 
 interface YearProgressChartProps {
   activities: StravaActivity[];

@@ -1,4 +1,4 @@
-import zwiftLogo from "../assets/zwift.svg";
+import zwiftLogo from "../../assets/zwift.svg";
 
 export type ActivityFilter = "all" | "outdoor" | "indoor" | "races";
 

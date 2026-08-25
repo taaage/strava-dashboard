@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { getPowerRecords } from "../lib/api";
-import { PowerRadar } from "../components/PowerRadar";
-import { Section } from "../components/layout";
-import { CardPlaceholder } from "../components/CardPlaceholder";
+import { getPowerRecords } from "../../lib/api";
+import { PowerRadar } from "./PowerRadar";
+import { Section } from "../../shared/layout";
+import { CardPlaceholder } from "../../shared/CardPlaceholder";
 
 export function PowerSection() {
   const { data: powerRecords } = useQuery({ queryKey: ["powerRecords"], queryFn: getPowerRecords });

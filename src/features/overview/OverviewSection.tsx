@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { getActivities, getStats } from "../lib/api";
-import { GoalsSection as Goals } from "../components/GoalsSection";
-import { YearProgressChart } from "../components/YearProgressChart";
-import { Section } from "../components/layout";
-import { CardPlaceholder } from "../components/CardPlaceholder";
+import { getActivities, getStats } from "../../lib/api";
+import { GoalsSection as Goals } from "./GoalsSection";
+import { YearProgressChart } from "./YearProgressChart";
+import { Section } from "../../shared/layout";
+import { CardPlaceholder } from "../../shared/CardPlaceholder";
 
 export function OverviewSection() {
   const { data: stats } = useQuery({ queryKey: ["stats"], queryFn: getStats });

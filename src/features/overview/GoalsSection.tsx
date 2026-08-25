@@ -1,4 +1,4 @@
-import { StravaActivity, StravaStats } from "../lib/api";
+import { StravaActivity, StravaStats } from "../../lib/api";
 import { RadialProgress } from "./RadialProgress";
 
 interface GoalsSectionProps {

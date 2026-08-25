@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { getZones } from "../lib/api";
-import { PowerZoneChart, HRZoneChart } from "../components/ZoneCharts";
-import { Section } from "../components/layout";
-import { CardPlaceholder } from "../components/CardPlaceholder";
+import { getZones } from "../../lib/api";
+import { PowerZoneChart, HRZoneChart } from "./ZoneCharts";
+import { Section } from "../../shared/layout";
+import { CardPlaceholder } from "../../shared/CardPlaceholder";
 
 export function ZonesSection() {
   const { data: zones } = useQuery({ queryKey: ["zones"], queryFn: getZones });

@@ -7,16 +7,16 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { StravaActivity } from "../lib/api";
+import { StravaActivity } from "../../lib/api";
 import {
   isRide,
   getMondayKey,
   getWeekLabel,
   filterByDays,
-} from "../lib/activity-utils";
-import { useTimeRange } from "./layout";
-import { TimeRangeSelector } from "./TimeRangeSelector";
-import { LineToggle, useLineToggle } from "./LineToggle";
+} from "../../lib/activity-utils";
+import { useTimeRange } from "../../shared/layout";
+import { TimeRangeSelector } from "../../shared/TimeRangeSelector";
+import { LineToggle, useLineToggle } from "../../shared/LineToggle";
 
 interface WeeklyAreaChartProps {
   activities: StravaActivity[];

@@ -1,6 +1,6 @@
-import { StravaActivity } from "../lib/api";
-import { formatDistance, formatDuration, formatSpeed, formatDate, formatElevation } from "../lib/utils";
-import zwiftLogo from "../assets/zwift.svg";
+import { StravaActivity } from "../../lib/api";
+import { formatDistance, formatDuration, formatSpeed, formatDate, formatElevation } from "../../lib/utils";
+import zwiftLogo from "../../assets/zwift.svg";
 
 interface ActivityRowProps {
   activity: StravaActivity;

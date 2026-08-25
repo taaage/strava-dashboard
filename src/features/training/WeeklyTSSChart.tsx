@@ -1,6 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from "recharts";
-import { StravaActivity } from "../lib/api";
-import { ChartCard, useTimeRange } from "./layout";
+import { StravaActivity } from "../../lib/api";
+import { ChartCard, useTimeRange } from "../../shared/layout";
 
 interface WeeklyTSSChartProps {
   activities: StravaActivity[];

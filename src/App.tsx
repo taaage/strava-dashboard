@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAthlete } from "./lib/api";
-import { OverviewSection } from "./sections/OverviewSection";
-import { StatsSection } from "./sections/StatsSection";
-import { PowerSection } from "./sections/PowerSection";
-import { TrainingSection } from "./sections/TrainingSection";
-import { ZonesSection } from "./sections/ZonesSection";
-import { ActivitiesSection } from "./sections/ActivitiesSection";
+import { OverviewSection } from "./features/overview/OverviewSection";
+import { StatsSection } from "./features/stats/StatsSection";
+import { PowerSection } from "./features/power/PowerSection";
+import { TrainingSection } from "./features/training/TrainingSection";
+import { ZonesSection } from "./features/zones/ZonesSection";
+import { ActivitiesSection } from "./features/activities/ActivitiesSection";
 
 export default function App() {
   const { data: athlete } = useQuery({

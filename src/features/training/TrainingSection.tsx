@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { getActivities } from "../lib/api";
-import { WeeklyAreaChart } from "../components/WeeklyAreaChart";
-import { EfficiencyAreaChart } from "../components/EfficiencyAreaChart";
-import { FitnessChart } from "../components/FitnessChart";
-import { WeeklyTSSChart } from "../components/WeeklyTSSChart";
-import { Section } from "../components/layout";
-import { CardPlaceholder } from "../components/CardPlaceholder";
+import { getActivities } from "../../lib/api";
+import { WeeklyAreaChart } from "./WeeklyDistanceChart";
+import { EfficiencyAreaChart } from "./EfficiencyChart";
+import { FitnessChart } from "./FitnessChart";
+import { WeeklyTSSChart } from "./WeeklyTSSChart";
+import { Section } from "../../shared/layout";
+import { CardPlaceholder } from "../../shared/CardPlaceholder";
 
 export function TrainingSection() {
   const { data: activities = [] } = useQuery({ queryKey: ["activities"], queryFn: getActivities });

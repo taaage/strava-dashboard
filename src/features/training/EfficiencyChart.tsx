@@ -1,6 +1,6 @@
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { StravaActivity } from "../lib/api";
-import { ChartCard, useTimeRange } from "./layout";
+import { StravaActivity } from "../../lib/api";
+import { ChartCard, useTimeRange } from "../../shared/layout";
 
 interface EfficiencyAreaChartProps {
   activities: StravaActivity[];
