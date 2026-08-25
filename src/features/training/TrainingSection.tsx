@@ -33,9 +33,11 @@ export function TrainingSection() {
       <Section>
         <EfficiencyAreaChart activities={activities} />
       </Section>
-      <Section>
+
+      {/* <Section>
         <FitnessChart activities={activities} />
-      </Section>
+      </Section> */}
+
       <Section>
         <WeeklyTSSChart activities={activities} />
       </Section>
