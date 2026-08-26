@@ -75,14 +75,7 @@ export function HrVsPowerChart({ streams }: StreamChartsProps) {
       </div>
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart
-            onClick={(e) => {
-              const point = e?.activePayload?.[0]?.payload;
-              if (point?.activityId) {
-                window.open(`https://www.strava.com/activities/${point.activityId}`, "_blank");
-              }
-            }}
-          >
+          <ScatterChart>
             <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
             <XAxis
               dataKey="watts"
@@ -123,7 +116,15 @@ export function HrVsPowerChart({ streams }: StreamChartsProps) {
                 );
               }}
             />
-            <Scatter data={data} cursor="pointer">
+            <Scatter
+              data={data}
+              cursor="pointer"
+              onClick={(entry: any) => {
+                if (entry?.activityId) {
+                  window.open(`https://www.strava.com/activities/${entry.activityId}`, "_blank");
+                }
+              }}
+            >
               {data.map((entry, index) => (
                 <Cell
                   key={index}

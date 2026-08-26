@@ -131,16 +131,7 @@ export function PowerCurve({ streams }: PowerCurveProps) {
       </div>
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={chartData}
-            onClick={(e) => {
-              if (!isClickable) return;
-              const point = e?.activePayload?.[0]?.payload;
-              if (point?.activityId) {
-                window.open(`https://www.strava.com/activities/${point.activityId}`, "_blank");
-              }
-            }}
-          >
+          <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
             <XAxis
               dataKey="label"
@@ -187,7 +178,18 @@ export function PowerCurve({ streams }: PowerCurveProps) {
                 strokeWidth={key === "All-time" ? 2.5 : 2}
                 strokeDasharray={key === "All-time" ? undefined : "4 3"}
                 dot={false}
-                activeDot={{ r: 3, cursor: isClickable ? "pointer" : "default" }}
+                activeDot={{
+                  r: 4,
+                  cursor: isClickable ? "pointer" : "default",
+                  onClick: isClickable
+                    ? (_: any, event: any) => {
+                        const activityId = event?.payload?.activityId;
+                        if (activityId) {
+                          window.open(`https://www.strava.com/activities/${activityId}`, "_blank");
+                        }
+                      }
+                    : undefined,
+                }}
               />
             ))}
           </LineChart>
