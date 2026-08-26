@@ -34,6 +34,7 @@ export function EfficiencyAreaChart({ activities }: EfficiencyAreaChartProps) {
     )
     .reverse()
     .map((a) => ({
+      id: a.id,
       date: new Date(a.start_date_local).toLocaleDateString("en-GB", {
         day: "numeric",
         month: "short",
@@ -52,7 +53,16 @@ export function EfficiencyAreaChart({ activities }: EfficiencyAreaChartProps) {
       timeRange={timeRange}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={rides}>
+        <AreaChart
+          data={rides}
+          onClick={(e) => {
+            const point = e?.activePayload?.[0]?.payload;
+            if (point?.id) {
+              window.open(`https://www.strava.com/activities/${point.id}`, "_blank");
+            }
+          }}
+          style={{ cursor: "pointer" }}
+        >
           <defs>
             <linearGradient id="colorEfficiency" x1="0" y1="0" x2="0" y2="1">
               <stop

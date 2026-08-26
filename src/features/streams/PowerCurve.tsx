@@ -36,16 +36,18 @@ function formatDuration(seconds: number): string {
   return `${(seconds / 3600).toFixed(1)}h`;
 }
 
-function computePowerCurve(streams: RideStream[]): Record<number, number> {
-  const envelope: Record<number, number> = {};
+function computePowerCurve(streams: RideStream[]): Record<number, { watts: number; activityId: number }> {
+  const envelope: Record<number, { watts: number; activityId: number }> = {};
   for (const duration of CURVE_DURATIONS) {
-    envelope[duration] = 0;
+    envelope[duration] = { watts: 0, activityId: 0 };
   }
   for (const stream of streams) {
     if (stream.watts.length === 0) continue;
     for (const duration of CURVE_DURATIONS) {
       const best = computeBestEffort(stream.watts, duration);
-      if (best > envelope[duration]) envelope[duration] = best;
+      if (best > envelope[duration].watts) {
+        envelope[duration] = { watts: best, activityId: stream.activityId };
+      }
     }
   }
   return envelope;
@@ -70,7 +72,7 @@ export function PowerCurve({ streams }: PowerCurveProps) {
   };
 
   const curves = useMemo(() => {
-    const result: Record<string, Record<number, number>> = {};
+    const result: Record<string, Record<number, { watts: number; activityId: number }>> = {};
     for (const key of selected) {
       const filtered =
         key === "All-time"
@@ -82,15 +84,21 @@ export function PowerCurve({ streams }: PowerCurveProps) {
   }, [streams, selected]);
 
   const chartData = CURVE_DURATIONS.map((d) => {
-    const point: Record<string, string | number> = {
+    const point: Record<string, any> = {
       duration: d,
       label: formatDuration(d),
     };
     for (const key of selected) {
-      point[key] = curves[key]?.[d] ?? 0;
+      point[key] = curves[key]?.[d]?.watts ?? 0;
+    }
+    // Store activityId from first selected line for click navigation
+    if (selected.length === 1) {
+      point.activityId = curves[selected[0]]?.[d]?.activityId ?? 0;
     }
     return point;
   });
+
+  const isClickable = selected.length === 1;
 
   const options = ["All-time", ...years];
 
@@ -102,7 +110,7 @@ export function PowerCurve({ streams }: PowerCurveProps) {
             Power Curve
           </h2>
           <p className="text-sm text-text-muted">
-            Best efforts — select years to compare
+            Best efforts — {isClickable ? "click to open in Strava" : "select years to compare"}
           </p>
         </div>
         <div className="flex flex-wrap gap-1">
@@ -123,7 +131,16 @@ export function PowerCurve({ streams }: PowerCurveProps) {
       </div>
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
+          <LineChart
+            data={chartData}
+            onClick={(e) => {
+              if (!isClickable) return;
+              const point = e?.activePayload?.[0]?.payload;
+              if (point?.activityId) {
+                window.open(`https://www.strava.com/activities/${point.activityId}`, "_blank");
+              }
+            }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
             <XAxis
               dataKey="label"
@@ -170,7 +187,7 @@ export function PowerCurve({ streams }: PowerCurveProps) {
                 strokeWidth={key === "All-time" ? 2.5 : 2}
                 strokeDasharray={key === "All-time" ? undefined : "4 3"}
                 dot={false}
-                activeDot={{ r: 3 }}
+                activeDot={{ r: 3, cursor: isClickable ? "pointer" : "default" }}
               />
             ))}
           </LineChart>
