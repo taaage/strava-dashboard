@@ -13,7 +13,7 @@ import {
   Cell,
 } from "recharts";
 import { type RideStream } from "../../api/api";
-import { ChartCard } from "../../shared/layout";
+import { ChartCard } from "../../shared";
 import {
   type RideCategory,
   CATEGORIES,

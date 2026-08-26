@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "recharts";
 import { type RideStream } from "../../api/api";
-import { TimeRangeSelector } from "../../shared/TimeRangeSelector";
+import { TimeRangeSelector } from "../../shared";
 import { DURATIONS, REFERENCE, computeRecords, filterStreamsByDays } from "./utils";
 
 interface PowerRadarProps {

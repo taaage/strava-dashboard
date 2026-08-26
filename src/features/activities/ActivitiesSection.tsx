@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getActivities } from "../../api/api";
 import { ActivityList } from "./ActivityList";
-import { Section } from "../../shared/layout";
-import { CardPlaceholder } from "../../shared/CardPlaceholder";
+import { Section, CardPlaceholder } from "../../shared";
 
 export function ActivitiesSection() {
   const { data: activities = [] } = useQuery({

@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { TimeRangeSelector } from "../TimeRangeSelector";
+import { TimeRangeSelector } from "./TimeRangeSelector";
 
 interface ChartCardProps {
   title: string;

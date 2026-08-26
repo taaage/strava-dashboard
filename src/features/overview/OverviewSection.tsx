@@ -2,8 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getActivities, getStats } from "../../api/api";
 import { GoalsSection as Goals } from "./GoalsSection";
 import { YearProgressChart } from "./YearProgressChart";
-import { Section } from "../../shared/layout";
-import { CardPlaceholder } from "../../shared/CardPlaceholder";
+import { Section, CardPlaceholder } from "../../shared";
 
 export function OverviewSection() {
   const { data: stats } = useQuery({ queryKey: ["stats"], queryFn: getStats });

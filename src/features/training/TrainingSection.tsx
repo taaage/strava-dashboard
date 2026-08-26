@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getActivities, getAthlete } from "../../api/api";
-import { CardPlaceholder } from "../../shared/CardPlaceholder";
-import { Section } from "../../shared/layout";
+import { CardPlaceholder, Section } from "../../shared";
 import { EfficiencyAreaChart } from "./EfficiencyChart";
 import { WeeklyAreaChart } from "./WeeklyDistanceChart";
 import { WeeklyTSSChart } from "./WeeklyTSSChart";

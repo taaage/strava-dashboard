@@ -9,7 +9,7 @@ import {
   YAxis,
 } from "recharts";
 import { StravaActivity } from "../../api/api";
-import { ChartCard, useTimeRange } from "../../shared/layout";
+import { ChartCard, useTimeRange } from "../../shared";
 
 interface FitnessChartProps {
   activities: StravaActivity[];

@@ -14,9 +14,7 @@ import {
   getWeekLabel,
   filterByDays,
 } from "../../shared/utils";
-import { useTimeRange } from "../../shared/layout";
-import { TimeRangeSelector } from "../../shared/TimeRangeSelector";
-import { LineToggle, useLineToggle } from "../../shared/LineToggle";
+import { useTimeRange, TimeRangeSelector, LineToggle, useLineToggle } from "../../shared";
 
 interface WeeklyAreaChartProps {
   activities: StravaActivity[];
