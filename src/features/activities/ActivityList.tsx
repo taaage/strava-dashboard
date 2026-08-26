@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { StravaActivity } from "../../api/api";
-import { isRide } from "../../lib/activity-utils";
+import { isRide } from "../../shared/utils";
 import { ActivityRow } from "./ActivityRow";
 import { ActivityFilters, ActivityFilter } from "./ActivityFilters";
 

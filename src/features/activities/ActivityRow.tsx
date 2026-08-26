@@ -5,7 +5,7 @@ import {
   formatSpeed,
   formatDate,
   formatElevation,
-} from "../../lib/utils";
+} from "../../shared/utils";
 import zwiftLogo from "../../assets/zwift.svg";
 
 interface ActivityRowProps {

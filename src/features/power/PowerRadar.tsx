@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import { type RideStream } from "../../api/api";
 import { TimeRangeSelector } from "../../shared/TimeRangeSelector";
-import { DURATIONS, REFERENCE, computeRecords, filterStreamsByDays } from "./power.utils";
+import { DURATIONS, REFERENCE, computeRecords, filterStreamsByDays } from "./utils";
 
 interface PowerRadarProps {
   streams: RideStream[];

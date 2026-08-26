@@ -9,7 +9,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { type RideStream } from "../../api/api";
-import { computeBestEffort } from "../power/power.utils";
+import { computeBestEffort } from "../power/utils";
 
 interface PowerCurveProps {
   streams: RideStream[];

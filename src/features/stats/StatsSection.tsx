@@ -4,7 +4,7 @@ import {
   formatDistance,
   formatDuration,
   formatElevation,
-} from "../../lib/utils";
+} from "../../shared/utils";
 import { StatCard } from "../../shared/StatCard";
 import { CardPlaceholder } from "../../shared/CardPlaceholder";
 import { Section, StatsGrid } from "../../shared/layout";

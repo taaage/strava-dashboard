@@ -13,7 +13,7 @@ import {
   getMondayKey,
   getWeekLabel,
   filterByDays,
-} from "../../lib/activity-utils";
+} from "../../shared/utils";
 import { useTimeRange } from "../../shared/layout";
 import { TimeRangeSelector } from "../../shared/TimeRangeSelector";
 import { LineToggle, useLineToggle } from "../../shared/LineToggle";
