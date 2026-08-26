@@ -27,7 +27,7 @@ interface StreamChartsProps {
 
 export function HrVsPowerChart({ streams }: StreamChartsProps) {
   const allData = useMemo(() => computeHrVsPower(streams), [streams]);
-  const [selected, setSelected] = useState<RideCategory[]>(["Race", "Tempo", "Endurance"]);
+  const [selected, setSelected] = useState<RideCategory[]>(["Race"]);
 
   const toggle = (cat: RideCategory) => {
     setSelected((prev) =>

@@ -110,7 +110,7 @@ function ZoneBar({
 }
 
 export function PowerZoneChart({ streams, athleteZones }: ZoneChartsProps) {
-  const [days, setDays] = useState(90);
+  const [days, setDays] = useState(30);
   const filtered = useMemo(
     () => filterStreamsByDays(streams, days),
     [streams, days],
@@ -139,7 +139,7 @@ export function PowerZoneChart({ streams, athleteZones }: ZoneChartsProps) {
 }
 
 export function HRZoneChart({ streams, athleteZones }: ZoneChartsProps) {
-  const [days, setDays] = useState(90);
+  const [days, setDays] = useState(30);
   const filtered = useMemo(
     () => filterStreamsByDays(streams, days),
     [streams, days],
