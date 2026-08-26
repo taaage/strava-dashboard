@@ -1,16 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { getPowerRecords } from "../../api/api";
+import { getRideStreams } from "../../api/api";
 import { PowerRadar } from "./PowerRadar";
 import { Section } from "../../shared/layout";
 import { CardPlaceholder } from "../../shared/CardPlaceholder";
 
 export function PowerSection() {
-  const { data: powerRecords } = useQuery({
-    queryKey: ["powerRecords"],
-    queryFn: getPowerRecords,
+  const { data: streams = [] } = useQuery({
+    queryKey: ["rideStreams"],
+    queryFn: getRideStreams,
   });
 
-  if (!powerRecords)
+  if (streams.length === 0)
     return (
       <Section>
         <CardPlaceholder height="h-[430px]" />
@@ -19,7 +19,7 @@ export function PowerSection() {
 
   return (
     <Section>
-      <PowerRadar records={powerRecords} />
+      <PowerRadar streams={streams} />
     </Section>
   );
 }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   PolarAngleAxis,
   PolarGrid,
@@ -6,14 +7,32 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { type PowerRecords } from "../../api/api";
+import { type RideStream } from "../../api/api";
+import { TimeRangeSelector } from "../../shared/TimeRangeSelector";
 
 interface PowerRadarProps {
-  records: PowerRecords;
+  streams: RideStream[];
 }
 
+const DURATIONS: { key: string; seconds: number }[] = [
+  { key: "5s", seconds: 5 },
+  { key: "15s", seconds: 15 },
+  { key: "30s", seconds: 30 },
+  { key: "1min", seconds: 60 },
+  { key: "2min", seconds: 120 },
+  { key: "3min", seconds: 180 },
+  { key: "5min", seconds: 300 },
+  { key: "8min", seconds: 480 },
+  { key: "10min", seconds: 600 },
+  { key: "15min", seconds: 900 },
+  { key: "20min", seconds: 1200 },
+  { key: "30min", seconds: 1800 },
+  { key: "45min", seconds: 2700 },
+  { key: "60min", seconds: 3600 },
+];
+
 // Reference values = Competitive Cat B racing (~3.6 w/kg for 85kg rider)
-const REFERENCE: Record<keyof PowerRecords, number> = {
+const REFERENCE: Record<string, number> = {
   "5s": 1200,
   "15s": 950,
   "30s": 720,
@@ -30,47 +49,72 @@ const REFERENCE: Record<keyof PowerRecords, number> = {
   "60min": 290,
 };
 
-// All-time personal records
-const ALL_TIME: Record<keyof PowerRecords, number> = {
-  "5s": 1320,
-  "15s": 1100,
-  "30s": 856,
-  "1min": 726,
-  "2min": 507,
-  "3min": 455,
-  "5min": 417,
-  "8min": 395,
-  "10min": 386,
-  "15min": 349,
-  "20min": 346,
-  "30min": 325,
-  "45min": 321,
-  "60min": 317,
-};
+function computeBestEffort(watts: number[], durationSeconds: number): number {
+  if (watts.length < durationSeconds) return 0;
+  let maxAvg = 0;
+  let windowSum = 0;
+  for (let i = 0; i < durationSeconds; i++) windowSum += watts[i];
+  maxAvg = windowSum / durationSeconds;
+  for (let i = durationSeconds; i < watts.length; i++) {
+    windowSum += watts[i] - watts[i - durationSeconds];
+    const avg = windowSum / durationSeconds;
+    if (avg > maxAvg) maxAvg = avg;
+  }
+  return Math.round(maxAvg);
+}
 
-export function PowerRadar({ records }: PowerRadarProps) {
-  const chartData = (Object.keys(REFERENCE) as (keyof PowerRecords)[]).map(
-    (key) => ({
-      effort: key,
-      watts: records[key],
-      allTimeWatts: ALL_TIME[key],
-      reference: REFERENCE[key],
-      normalized: Math.round((records[key] / REFERENCE[key]) * 100),
-      allTimeNormalized:
-        ALL_TIME[key] > 0
-          ? Math.round((ALL_TIME[key] / REFERENCE[key]) * 100)
-          : null,
-    }),
-  );
+function computeRecords(streams: RideStream[]): Record<string, number> {
+  const records: Record<string, number> = {};
+  DURATIONS.forEach(({ key }) => (records[key] = 0));
+
+  for (const stream of streams) {
+    if (stream.watts.length === 0) continue;
+    for (const { key, seconds } of DURATIONS) {
+      const best = computeBestEffort(stream.watts, seconds);
+      if (best > records[key]) records[key] = best;
+    }
+  }
+  return records;
+}
+
+function filterStreamsByDays(streams: RideStream[], days: number): RideStream[] {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  return streams.filter((s) => new Date(s.date) >= cutoff);
+}
+
+export function PowerRadar({ streams }: PowerRadarProps) {
+  const [days, setDays] = useState(90);
+
+  const allTimeRecords = computeRecords(streams);
+  const filteredStreams = filterStreamsByDays(streams, days);
+  const currentRecords = computeRecords(filteredStreams);
+
+  const chartData = DURATIONS.map(({ key }) => ({
+    effort: key,
+    watts: currentRecords[key],
+    allTimeWatts: allTimeRecords[key],
+    reference: REFERENCE[key],
+    normalized: Math.round((currentRecords[key] / REFERENCE[key]) * 100),
+    allTimeNormalized:
+      allTimeRecords[key] > 0
+        ? Math.round((allTimeRecords[key] / REFERENCE[key]) * 100)
+        : null,
+  }));
 
   return (
     <div className="bg-surface-card rounded-3xl p-8 border border-surface-border">
-      <h2 className="text-lg font-semibold text-text-primary mb-1">
-        Power Records
-      </h2>
-      <p className="text-sm text-text-muted mb-4">
-        Best effort last 20 rides - category B references
-      </p>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-lg font-semibold text-text-primary mb-1">
+            Power Records
+          </h2>
+          <p className="text-sm text-text-muted">
+            Best efforts vs all-time — Cat B reference
+          </p>
+        </div>
+        <TimeRangeSelector selected={days} onChange={setDays} />
+      </div>
       <div className="h-[350px]">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={chartData} cx="50%" cy="50%" outerRadius="70%">
@@ -94,11 +138,9 @@ export function PowerRadar({ records }: PowerRadarProps) {
                     <p className="text-sm font-medium text-white">
                       Current: {data?.watts}W
                     </p>
-                    {data?.allTimeWatts > 0 && (
-                      <p className="text-sm text-[hsl(280,65%,60%)]">
-                        All-time: {data?.allTimeWatts}W
-                      </p>
-                    )}
+                    <p className="text-sm text-[hsl(280,65%,60%)]">
+                      All-time: {data?.allTimeWatts}W
+                    </p>
                     <p className="text-xs text-text-secondary mt-1">
                       Cat B: {data?.reference}W
                     </p>
