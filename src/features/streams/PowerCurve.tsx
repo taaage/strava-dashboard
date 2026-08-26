@@ -9,6 +9,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { type RideStream } from "../../api/api";
+import { computeBestEffort } from "../power/power.utils";
 
 interface PowerCurveProps {
   streams: RideStream[];
@@ -28,20 +29,6 @@ const YEAR_COLORS: Record<string, string> = {
   "2022": "hsl(50, 70%, 50%)",
   "2021": "hsl(190, 60%, 50%)",
 };
-
-function computeBestEffort(watts: number[], durationSeconds: number): number {
-  if (watts.length < durationSeconds) return 0;
-  let maxAvg = 0;
-  let windowSum = 0;
-  for (let i = 0; i < durationSeconds; i++) windowSum += watts[i];
-  maxAvg = windowSum / durationSeconds;
-  for (let i = durationSeconds; i < watts.length; i++) {
-    windowSum += watts[i] - watts[i - durationSeconds];
-    const avg = windowSum / durationSeconds;
-    if (avg > maxAvg) maxAvg = avg;
-  }
-  return Math.round(maxAvg);
-}
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;

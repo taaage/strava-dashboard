@@ -49,23 +49,6 @@ interface RideTotals {
   elevation_gain: number;
 }
 
-export interface PowerRecords {
-  "5s": number;
-  "15s": number;
-  "30s": number;
-  "1min": number;
-  "2min": number;
-  "3min": number;
-  "5min": number;
-  "8min": number;
-  "10min": number;
-  "15min": number;
-  "20min": number;
-  "30min": number;
-  "45min": number;
-  "60min": number;
-}
-
 export interface ZoneData {
   power: ZoneEntry[];
   hr: ZoneEntry[];
@@ -102,12 +85,6 @@ const EMPTY_STATS: StravaStats = {
   all_ride_totals: { count: 0, distance: 0, moving_time: 0, elapsed_time: 0, elevation_gain: 0 },
 };
 
-const EMPTY_POWER: PowerRecords = {
-  "5s": 0, "15s": 0, "30s": 0, "1min": 0, "2min": 0, "3min": 0,
-  "5min": 0, "8min": 0, "10min": 0, "15min": 0, "20min": 0,
-  "30min": 0, "45min": 0, "60min": 0,
-};
-
 const EMPTY_ZONES: ZoneData = { power: [], hr: [] };
 
 export function getAthlete(): Promise<StravaAthlete | null> {
@@ -120,10 +97,6 @@ export function getStats(): Promise<StravaStats> {
 
 export function getActivities(): Promise<StravaActivity[]> {
   return apiFetch("/api/activities", []);
-}
-
-export function getPowerRecords(): Promise<PowerRecords> {
-  return apiFetch("/api/power-records", EMPTY_POWER);
 }
 
 export function getZones(): Promise<ZoneData> {

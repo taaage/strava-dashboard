@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   PolarAngleAxis,
   PolarGrid,
@@ -18,9 +18,9 @@ interface PowerRadarProps {
 export function PowerRadar({ streams }: PowerRadarProps) {
   const [days, setDays] = useState(90);
 
-  const allTimeRecords = computeRecords(streams);
-  const filteredStreams = filterStreamsByDays(streams, days);
-  const currentRecords = computeRecords(filteredStreams);
+  const allTimeRecords = useMemo(() => computeRecords(streams), [streams]);
+  const filteredStreams = useMemo(() => filterStreamsByDays(streams, days), [streams, days]);
+  const currentRecords = useMemo(() => computeRecords(filteredStreams), [filteredStreams]);
 
   const chartData = DURATIONS.map(({ key }) => ({
     effort: key,
