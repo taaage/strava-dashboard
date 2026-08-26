@@ -116,8 +116,8 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
   const sortedSelected = [...selectedYears].sort((a, b) => b - a);
 
   return (
-    <div className="bg-surface-card rounded-3xl p-8 border border-surface-border">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-surface-card rounded-3xl p-5 sm:p-8 border border-surface-border">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h2 className="text-lg font-semibold text-text-primary mb-1">
             Year Progress
@@ -137,7 +137,8 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
                   : "text-text-muted hover:text-text-secondary"
               }`}
             >
-              {year}
+              <span className="sm:hidden">'{String(year).slice(2)}</span>
+              <span className="hidden sm:inline">{year}</span>
             </button>
           ))}
         </div>

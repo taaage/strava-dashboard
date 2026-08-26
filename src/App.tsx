@@ -16,7 +16,7 @@ export default function App() {
   });
 
   return (
-    <main className="px-6 py-12 max-w-4xl mx-auto">
+    <main className="px-4 sm:px-6 py-8 sm:py-12 max-w-4xl mx-auto">
       <div className="mb-10">
         <h1 className="text-2xl font-semibold text-text-primary">
           Hey {athlete?.firstname ?? "rider"} 👋

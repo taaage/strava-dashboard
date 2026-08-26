@@ -21,8 +21,7 @@ const CURVE_DURATIONS = [
 ];
 
 const YEAR_COLORS: Record<string, string> = {
-  "All-time": "hsl(221, 83%, 53%)",
-  "2026": "hsl(160, 60%, 45%)",
+  "2026": "hsl(221, 83%, 53%)",
   "2025": "hsl(280, 65%, 60%)",
   "2024": "hsl(30, 80%, 55%)",
   "2023": "hsl(0, 70%, 55%)",
@@ -63,7 +62,7 @@ function getAvailableYears(streams: RideStream[]): string[] {
 
 export function PowerCurve({ streams }: PowerCurveProps) {
   const years = useMemo(() => getAvailableYears(streams), [streams]);
-  const [selected, setSelected] = useState<string[]>(["All-time"]);
+  const [selected, setSelected] = useState<string[]>([years[0] ?? "2026"]);
 
   const toggle = (year: string) => {
     setSelected((prev) =>
@@ -74,10 +73,7 @@ export function PowerCurve({ streams }: PowerCurveProps) {
   const curves = useMemo(() => {
     const result: Record<string, Record<number, { watts: number; activityId: number }>> = {};
     for (const key of selected) {
-      const filtered =
-        key === "All-time"
-          ? streams
-          : streams.filter((s) => new Date(s.date).getFullYear().toString() === key);
+      const filtered = streams.filter((s) => new Date(s.date).getFullYear().toString() === key);
       result[key] = computePowerCurve(filtered);
     }
     return result;
@@ -91,7 +87,6 @@ export function PowerCurve({ streams }: PowerCurveProps) {
     for (const key of selected) {
       point[key] = curves[key]?.[d]?.watts ?? 0;
     }
-    // Store activityId from first selected line for click navigation
     if (selected.length === 1) {
       point.activityId = curves[selected[0]]?.[d]?.activityId ?? 0;
     }
@@ -100,11 +95,11 @@ export function PowerCurve({ streams }: PowerCurveProps) {
 
   const isClickable = selected.length === 1;
 
-  const options = ["All-time", ...years];
+  const options = years;
 
   return (
-    <div className="bg-surface-card rounded-3xl p-8 border border-surface-border">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-surface-card rounded-3xl p-5 sm:p-8 border border-surface-border">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h2 className="text-lg font-semibold text-text-primary mb-1">
             Power Curve
@@ -124,7 +119,8 @@ export function PowerCurve({ streams }: PowerCurveProps) {
                   : "text-text-muted hover:text-text-secondary"
               }`}
             >
-              {year}
+              <span className="sm:hidden">'{year.slice(2)}</span>
+              <span className="hidden sm:inline">{year}</span>
             </button>
           ))}
         </div>
@@ -175,8 +171,7 @@ export function PowerCurve({ streams }: PowerCurveProps) {
                 type="monotone"
                 dataKey={key}
                 stroke={YEAR_COLORS[key] ?? "hsl(221, 83%, 53%)"}
-                strokeWidth={key === "All-time" ? 2.5 : 2}
-                strokeDasharray={key === "All-time" ? undefined : "4 3"}
+                strokeWidth={2.5}
                 dot={false}
                 activeDot={{
                   r: 4,

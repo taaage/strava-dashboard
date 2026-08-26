@@ -24,14 +24,14 @@ export function ActivityRow({ activity }: ActivityRowProps) {
       rel="noopener noreferrer"
       className="block px-4 py-4 rounded-2xl hover:bg-surface-muted transition-colors"
     >
-      <div className="flex items-center justify-between mb-1.5">
-        <h3 className="font-medium text-text-primary">{activity.name}</h3>
-        <span className="text-sm text-text-muted">
+      <div className="flex items-center justify-between gap-4 mb-1.5">
+        <h3 className="font-medium text-text-primary text-sm sm:text-base truncate">{activity.name}</h3>
+        <span className="text-xs sm:text-sm text-text-muted shrink-0">
           {formatDate(activity.start_date_local)}
         </span>
       </div>
-      <div className="flex flex-wrap text-sm text-text-secondary">
-        <span className="w-28">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-y-1 text-sm text-text-secondary">
+        <span>
           {isIndoor(activity) ? (
             <img
               src={zwiftLogo}
@@ -43,19 +43,11 @@ export function ActivityRow({ activity }: ActivityRowProps) {
           )}
           {formatDistance(activity.distance)}
         </span>
-        <span className="w-24">🕑 {formatDuration(activity.moving_time)}</span>
-        <span className="w-28">💨 {formatSpeed(activity.average_speed)}</span>
-        <span className="w-24">
-          ⛰️ {formatElevation(activity.total_elevation_gain)}
-        </span>
-        {activity.average_watts && (
-          <span className="w-24">⚡ {activity.average_watts}W</span>
-        )}
-        {activity.average_heartrate && (
-          <span className="w-28">
-            ❤️ {Math.round(activity.average_heartrate)} bpm
-          </span>
-        )}
+        <span>🕑 {formatDuration(activity.moving_time)}</span>
+        <span>💨 {formatSpeed(activity.average_speed)}</span>
+        <span>⛰️ {formatElevation(activity.total_elevation_gain)}</span>
+        <span>⚡ {activity.average_watts ? `${activity.average_watts}W` : "–"}</span>
+        <span>❤️ {activity.average_heartrate ? `${Math.round(activity.average_heartrate)} bpm` : "–"}</span>
       </div>
     </a>
   );

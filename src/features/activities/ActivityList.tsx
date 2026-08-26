@@ -29,7 +29,7 @@ export function ActivityList({ activities }: ActivityListProps) {
 
   return (
     <div className="bg-surface-card rounded-3xl border border-surface-border overflow-hidden">
-      <div className="px-8 pt-8 pb-4 flex items-center justify-between">
+      <div className="px-5 sm:px-8 pt-6 sm:pt-8 pb-4 flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-text-primary">Rides</h2>
         <ActivityFilters
           filter={filter}
@@ -46,7 +46,7 @@ export function ActivityList({ activities }: ActivityListProps) {
           hasFilters={!!hasFilters}
         />
       </div>
-      <div className="px-8 pb-2 text-xs text-text-muted">
+      <div className="px-5 sm:px-8 pb-2 text-xs text-text-muted">
         {rides.length} rides{hasFilters && " found"}
       </div>
       <div className="px-4 pb-4 max-h-[600px] overflow-y-auto">

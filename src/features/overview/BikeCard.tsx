@@ -15,13 +15,13 @@ export function BikeCard({ athlete }: BikeCardProps) {
     : null;
 
   return (
-    <div className="bg-surface-card rounded-3xl px-8 py-5 border border-surface-border flex items-center justify-between text-sm">
+    <div className="bg-surface-card rounded-3xl px-4 sm:px-8 py-4 sm:py-5 border border-surface-border flex items-center justify-between text-xs sm:text-sm">
       {mainBike && (
         <span className="text-text-primary">
           {mainBike.name} <span className="text-text-muted">{bikeKm} km</span>
         </span>
       )}
-      <div className="flex gap-6 text-text-muted">
+      <div className="flex gap-3 sm:gap-6 text-text-muted">
         <span>
           FTP{" "}
           <span className="text-text-primary font-medium">{athlete.ftp}W</span>

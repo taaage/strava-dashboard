@@ -2,11 +2,41 @@ import { type RideStream } from "../../api/api";
 
 export type RideCategory = "Race" | "Tempo" | "Endurance" | "Recovery";
 
-export const CATEGORIES: { key: RideCategory; label: string; minWatts: number; maxWatts: number; color: string }[] = [
-  { key: "Race", label: "Race", minWatts: 250, maxWatts: 9999, color: "hsl(0, 70%, 55%)" },
-  { key: "Tempo", label: "Tempo", minWatts: 200, maxWatts: 250, color: "hsl(30, 80%, 55%)" },
-  { key: "Endurance", label: "Endurance", minWatts: 150, maxWatts: 200, color: "hsl(221, 83%, 53%)" },
-  { key: "Recovery", label: "Recovery", minWatts: 0, maxWatts: 150, color: "hsl(160, 60%, 45%)" },
+export const CATEGORIES: {
+  key: RideCategory;
+  label: string;
+  minWatts: number;
+  maxWatts: number;
+  color: string;
+}[] = [
+  {
+    key: "Race",
+    label: "Race",
+    minWatts: 250,
+    maxWatts: 9999,
+    color: "hsl(0, 70%, 55%)",
+  },
+  {
+    key: "Tempo",
+    label: "Tempo",
+    minWatts: 200,
+    maxWatts: 250,
+    color: "hsl(30, 80%, 55%)",
+  },
+  {
+    key: "Endurance",
+    label: "Zone 2",
+    minWatts: 150,
+    maxWatts: 200,
+    color: "hsl(221, 83%, 53%)",
+  },
+  {
+    key: "Recovery",
+    label: "Zzz",
+    minWatts: 0,
+    maxWatts: 150,
+    color: "hsl(160, 60%, 45%)",
+  },
 ];
 
 function categorizeRide(avgWatts: number): RideCategory {

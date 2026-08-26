@@ -35,7 +35,7 @@ export function ActivityFilters({
   hasFilters,
 }: ActivityFiltersProps) {
   return (
-    <div className="flex items-center gap-2 text-xs">
+    <div className="flex flex-wrap items-center gap-2 text-xs">
       {FILTERS.map(({ key, label, icon, logo }) => (
         <button
           key={key}

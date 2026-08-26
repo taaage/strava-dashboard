@@ -35,8 +35,8 @@ export function PowerRadar({ streams }: PowerRadarProps) {
   }));
 
   return (
-    <div className="bg-surface-card rounded-3xl p-8 border border-surface-border">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-surface-card rounded-3xl p-5 sm:p-8 border border-surface-border">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h2 className="text-lg font-semibold text-text-primary mb-1">
             Power Records
@@ -108,7 +108,7 @@ export function PowerRadar({ streams }: PowerRadarProps) {
           </RadarChart>
         </ResponsiveContainer>
       </div>
-      <div className="grid grid-cols-7 gap-2 mt-4 text-center">
+      <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 mt-4 text-center">
         {chartData.map((d) => (
           <div key={d.effort}>
             <p className="text-base font-semibold text-text-primary">

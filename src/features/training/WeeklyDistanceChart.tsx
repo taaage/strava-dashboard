@@ -64,21 +64,16 @@ export function WeeklyAreaChart({ activities }: WeeklyAreaChartProps) {
   });
 
   return (
-    <div className="bg-surface-card rounded-3xl p-8 border border-surface-border">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-lg font-semibold text-text-primary mb-1">
-            Weekly Distance
-          </h2>
-          <p className="text-sm text-text-muted">Outdoor vs indoor</p>
-        </div>
-        <div className="flex items-center gap-20">
-          <LineToggle lines={LINES} visible={visible} onToggle={toggle} />
-          <TimeRangeSelector
-            selected={timeRange.selected}
-            onChange={timeRange.onChange}
-          />
-        </div>
+    <div className="bg-surface-card rounded-3xl p-5 sm:p-8 border border-surface-border">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
+        <h2 className="text-lg font-semibold text-text-primary">
+          Weekly Distance
+        </h2>
+        <LineToggle lines={LINES} visible={visible} onToggle={toggle} />
+        <TimeRangeSelector
+          selected={timeRange.selected}
+          onChange={timeRange.onChange}
+        />
       </div>
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">

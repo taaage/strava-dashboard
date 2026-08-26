@@ -44,7 +44,7 @@ export function HrVsPowerChart({ streams }: StreamChartsProps) {
 
   return (
     <div className="bg-surface-card rounded-3xl p-8 border border-surface-border">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h2 className="text-lg font-semibold text-text-primary mb-1">
             HR vs Power

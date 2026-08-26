@@ -52,9 +52,9 @@ export function GoalsSection({ activities, stats }: GoalsSectionProps) {
   const ytdGoalKm = 10000;
 
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-3 gap-2 sm:gap-3">
       <RadialProgress
-        title="Weekly Goal"
+        title="Weekly"
         value={weeklyDistance}
         max={weeklyGoalKm}
         unit="km"
@@ -62,7 +62,7 @@ export function GoalsSection({ activities, stats }: GoalsSectionProps) {
         subtitle={`${Math.round((weeklyDistance / weeklyGoalKm) * 100)}% complete`}
       />
       <RadialProgress
-        title="Monthly Distance"
+        title="Monthly"
         value={monthlyDistance}
         max={monthlyGoalKm}
         unit="km"
@@ -70,7 +70,7 @@ export function GoalsSection({ activities, stats }: GoalsSectionProps) {
         subtitle={`${Math.round((monthlyDistance / monthlyGoalKm) * 100)}% complete`}
       />
       <RadialProgress
-        title="Year Distance"
+        title="Year"
         value={ytdDistance}
         max={ytdGoalKm}
         unit="km"
