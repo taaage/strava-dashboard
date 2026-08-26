@@ -1,16 +1,24 @@
+import { useMemo, useState } from "react";
 import {
-  BarChart,
   Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
+  BarChart,
   Cell,
   LabelList,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
 } from "recharts";
-import { ZoneData } from "../../api/api";
+import { type AthleteZones, type RideStream } from "../../api/api";
+import { TimeRangeSelector } from "../../shared";
+import {
+  computeHrZones,
+  computePowerZones,
+  filterStreamsByDays,
+} from "./utils";
 
 interface ZoneChartsProps {
-  zones: ZoneData;
+  streams: RideStream[];
+  athleteZones: AthleteZones;
 }
 
 const POWER_COLORS = [
@@ -22,6 +30,7 @@ const POWER_COLORS = [
   "hsl(0, 70%, 55%)",
   "hsl(280, 65%, 55%)",
 ];
+
 const HR_COLORS = [
   "hsl(210, 50%, 70%)",
   "hsl(210, 70%, 55%)",
@@ -100,30 +109,60 @@ function ZoneBar({
   );
 }
 
-export function PowerZoneChart({ zones }: ZoneChartsProps) {
+export function PowerZoneChart({ streams, athleteZones }: ZoneChartsProps) {
+  const [days, setDays] = useState(90);
+  const filtered = useMemo(
+    () => filterStreamsByDays(streams, days),
+    [streams, days],
+  );
+  const zones = useMemo(
+    () => computePowerZones(filtered, athleteZones),
+    [filtered, athleteZones],
+  );
+
   return (
     <div className="bg-surface-card rounded-3xl p-8 border border-surface-border">
-      <h2 className="text-lg font-semibold text-text-primary mb-1">
-        Power Zones
-      </h2>
-      <p className="text-sm text-text-muted mb-6">
-        Time in zone from last 20 rides
-      </p>
-      <ZoneBar data={zones.power} colors={POWER_COLORS} height="h-56" />
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-lg font-semibold text-text-primary mb-1">
+            Power Zones
+          </h2>
+          <p className="text-sm text-text-muted">
+            Time in zone from {filtered.length} rides
+          </p>
+        </div>
+        <TimeRangeSelector selected={days} onChange={setDays} />
+      </div>
+      <ZoneBar data={zones} colors={POWER_COLORS} height="h-56" />
     </div>
   );
 }
 
-export function HRZoneChart({ zones }: ZoneChartsProps) {
+export function HRZoneChart({ streams, athleteZones }: ZoneChartsProps) {
+  const [days, setDays] = useState(90);
+  const filtered = useMemo(
+    () => filterStreamsByDays(streams, days),
+    [streams, days],
+  );
+  const zones = useMemo(
+    () => computeHrZones(filtered, athleteZones),
+    [filtered, athleteZones],
+  );
+
   return (
     <div className="bg-surface-card rounded-3xl p-8 border border-surface-border">
-      <h2 className="text-lg font-semibold text-text-primary mb-1">
-        Heart Rate Zones
-      </h2>
-      <p className="text-sm text-text-muted mb-6">
-        Time in zone from last 20 rides
-      </p>
-      <ZoneBar data={zones.hr} colors={HR_COLORS} height="h-44" />
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-lg font-semibold text-text-primary mb-1">
+            Heart Rate Zones
+          </h2>
+          <p className="text-sm text-text-muted">
+            Time in zone from {filtered.length} rides
+          </p>
+        </div>
+        <TimeRangeSelector selected={days} onChange={setDays} />
+      </div>
+      <ZoneBar data={zones} colors={HR_COLORS} height="h-44" />
     </div>
   );
 }

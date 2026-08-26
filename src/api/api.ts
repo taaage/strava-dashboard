@@ -1,4 +1,3 @@
-const EMPTY_ZONES: ZoneData = { power: [], hr: [] };
 const API_BASE = import.meta.env.VITE_API_BASE ?? "https://api.tiggenilsson.se";
 
 export interface StravaAthlete {
@@ -50,18 +49,6 @@ interface RideTotals {
   elevation_gain: number;
 }
 
-export interface ZoneData {
-  power: ZoneEntry[];
-  hr: ZoneEntry[];
-}
-
-interface ZoneEntry {
-  name: string;
-  seconds: number;
-  hours: number;
-  percentage: number;
-}
-
 export interface RideStream {
   activityId: number;
   date: string;
@@ -95,6 +82,11 @@ const EMPTY_STATS: StravaStats = {
   },
 };
 
+export interface AthleteZones {
+  heart_rate: { zones: { min: number; max: number }[] };
+  power: { zones: { min: number; max: number }[] };
+}
+
 async function apiFetch<T>(endpoint: string, fallback: T): Promise<T> {
   try {
     const controller = new AbortController();
@@ -125,10 +117,10 @@ export function getActivities(): Promise<StravaActivity[]> {
   return apiFetch("/api/activities", []);
 }
 
-export function getZones(): Promise<ZoneData> {
-  return apiFetch("/api/zones", EMPTY_ZONES);
-}
-
 export function getRideStreams(): Promise<RideStream[]> {
   return apiFetch("/api/ride-streams", []);
+}
+
+export function getAthleteZones(): Promise<AthleteZones | null> {
+  return apiFetch("/api/athlete-zones", null);
 }
