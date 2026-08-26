@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getActivities, getStats } from "../../api/api";
 import { GoalsSection as Goals } from "./GoalsSection";
 import { YearProgressChart } from "./YearProgressChart";
+import { WeeklyAreaChart } from "../training/WeeklyDistanceChart";
 import { Section, CardPlaceholder } from "../../shared";
 
 export function OverviewSection() {
@@ -28,6 +29,9 @@ export function OverviewSection() {
     <>
       <Section title="Goals">
         <Goals activities={activities} stats={stats} />
+      </Section>
+      <Section>
+        <WeeklyAreaChart activities={activities} />
       </Section>
       <Section>
         <YearProgressChart activities={activities} />

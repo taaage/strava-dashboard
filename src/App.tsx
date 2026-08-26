@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAthlete } from "./api/api";
+import { ActivitiesSection } from "./features/activities/ActivitiesSection";
+import { BikeCard } from "./features/overview/BikeCard";
 import { OverviewSection } from "./features/overview/OverviewSection";
-import { StatsSection } from "./features/stats/StatsSection";
 import { PowerSection } from "./features/power/PowerSection";
+import { StatsSection } from "./features/stats/StatsSection";
 import { StreamsSection } from "./features/streams/StreamsSection";
 import { TrainingSection } from "./features/training/TrainingSection";
 import { ZonesSection } from "./features/zones/ZonesSection";
-import { ActivitiesSection } from "./features/activities/ActivitiesSection";
 
 export default function App() {
   const { data: athlete } = useQuery({
@@ -23,11 +24,17 @@ export default function App() {
         <p className="text-text-muted mt-1">Here's how your riding is going</p>
       </div>
 
+      {athlete && (
+        <div className="mb-8">
+          <BikeCard athlete={athlete} />
+        </div>
+      )}
+
       <OverviewSection />
       <StatsSection />
       <PowerSection />
-      <StreamsSection />
       <TrainingSection />
+      <StreamsSection />
       <ZonesSection />
       <ActivitiesSection />
     </main>

@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { getActivities, getAthlete } from "../../api/api";
 import { CardPlaceholder, Section } from "../../shared";
 import { EfficiencyAreaChart } from "./EfficiencyChart";
-import { WeeklyAreaChart } from "./WeeklyDistanceChart";
 import { WeeklyTSSChart } from "./WeeklyTSSChart";
 
 export function TrainingSection() {
@@ -18,7 +17,7 @@ export function TrainingSection() {
   if (activities.length === 0) {
     return (
       <>
-        {[...Array(4)].map((_, i) => (
+        {[...Array(3)].map((_, i) => (
           <Section key={i}>
             <CardPlaceholder />
           </Section>
@@ -32,7 +31,7 @@ export function TrainingSection() {
   return (
     <>
       <Section>
-        <WeeklyAreaChart activities={activities} />
+        <WeeklyTSSChart activities={activities} ftp={ftp} />
       </Section>
       <Section>
         <EfficiencyAreaChart activities={activities} />
@@ -41,10 +40,6 @@ export function TrainingSection() {
       {/* <Section>
         <FitnessChart activities={activities} ftp={ftp} />
       </Section> */}
-
-      <Section>
-        <WeeklyTSSChart activities={activities} ftp={ftp} />
-      </Section>
     </>
   );
 }
