@@ -1,4 +1,8 @@
-const API_BASE = import.meta.env.VITE_API_BASE ?? "https://api.tiggenilsson.se";
+const API_BASE = import.meta.env.VITE_API_BASE as string;
+
+if (!API_BASE) {
+  throw new Error("VITE_API_BASE is required. Set it in .env.local");
+}
 
 export interface StravaAthlete {
   id: number;

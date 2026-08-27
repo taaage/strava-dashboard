@@ -27,7 +27,7 @@ const MONTHS = [
   "Nov",
   "Dec",
 ];
-const YEARLY_GOAL = 10000;
+const YEARLY_GOAL = Number(import.meta.env.VITE_YEARLY_GOAL_KM) || 10000;
 
 const YEAR_COLORS = [
   "#e76e50",
@@ -123,7 +123,7 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
             Year Progress
           </h2>
           <p className="text-sm text-text-muted">
-            Cumulative distance toward 10,000 km
+            Cumulative distance toward {YEARLY_GOAL.toLocaleString()} km
           </p>
         </div>
         <div className="flex gap-1 flex-wrap">
@@ -159,7 +159,7 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
               tick={{ fill: "#71717a", fontSize: 11 }}
               tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
               dx={-4}
-              domain={[0, 10000]}
+              domain={[0, YEARLY_GOAL]}
             />
             <Tooltip
               content={({ active, payload, label }) => {

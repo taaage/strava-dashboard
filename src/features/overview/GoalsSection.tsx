@@ -47,9 +47,9 @@ export function GoalsSection({ activities, stats }: GoalsSectionProps) {
   const monthlyDistance = getThisMonthDistance(activities);
   const ytdDistance = stats.ytd_ride_totals.distance / 1000;
 
-  const weeklyGoalKm = 150;
-  const monthlyGoalKm = 650;
-  const ytdGoalKm = 10000;
+  const weeklyGoalKm = Number(import.meta.env.VITE_WEEKLY_GOAL_KM) || 150;
+  const monthlyGoalKm = Number(import.meta.env.VITE_MONTHLY_GOAL_KM) || 650;
+  const ytdGoalKm = Number(import.meta.env.VITE_YEARLY_GOAL_KM) || 10000;
 
   return (
     <div className="grid grid-cols-3 gap-2 sm:gap-3">
@@ -75,7 +75,7 @@ export function GoalsSection({ activities, stats }: GoalsSectionProps) {
         max={ytdGoalKm}
         unit="km"
         color="hsl(160, 60%, 45%)"
-        subtitle={`${Math.round((ytdDistance / ytdGoalKm) * 100)}% of 10,000 km`}
+        subtitle={`${Math.round((ytdDistance / ytdGoalKm) * 100)}% of ${ytdGoalKm.toLocaleString()} km`}
       />
     </div>
   );

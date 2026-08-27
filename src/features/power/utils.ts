@@ -17,8 +17,9 @@ export const DURATIONS: { key: string; seconds: number }[] = [
   { key: "60min", seconds: 3600 },
 ];
 
-// Reference values = Competitive Cat B racing (~3.6 w/kg for 85kg rider)
-export const REFERENCE: Record<string, number> = {
+// Reference values for the radar chart. Override via VITE_POWER_REFERENCE env var (JSON).
+// Defaults are ~Cat B racing (3.6 W/kg @ 85 kg).
+const DEFAULT_REFERENCE: Record<string, number> = {
   "5s": 1200,
   "15s": 950,
   "30s": 720,
@@ -35,7 +36,21 @@ export const REFERENCE: Record<string, number> = {
   "60min": 290,
 };
 
-export function computeBestEffort(watts: number[], durationSeconds: number): number {
+export const REFERENCE: Record<string, number> = (() => {
+  const raw = import.meta.env.VITE_POWER_REFERENCE;
+  if (!raw) return DEFAULT_REFERENCE;
+  try {
+    return { ...DEFAULT_REFERENCE, ...JSON.parse(raw) };
+  } catch {
+    console.warn("Invalid VITE_POWER_REFERENCE JSON, using defaults");
+    return DEFAULT_REFERENCE;
+  }
+})();
+
+export function computeBestEffort(
+  watts: number[],
+  durationSeconds: number,
+): number {
   if (watts.length < durationSeconds) return 0;
   let maxAvg = 0;
   let windowSum = 0;
@@ -63,7 +78,10 @@ export function computeRecords(streams: RideStream[]): Record<string, number> {
   return records;
 }
 
-export function filterStreamsByDays(streams: RideStream[], days: number): RideStream[] {
+export function filterStreamsByDays(
+  streams: RideStream[],
+  days: number,
+): RideStream[] {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - days);
   return streams.filter((s) => new Date(s.date) >= cutoff);

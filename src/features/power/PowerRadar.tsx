@@ -9,18 +9,31 @@ import {
 } from "recharts";
 import { type RideStream } from "../../api/api";
 import { TimeRangeSelector } from "../../shared";
-import { DURATIONS, REFERENCE, computeRecords, filterStreamsByDays } from "./utils";
+import {
+  DURATIONS,
+  REFERENCE,
+  computeRecords,
+  filterStreamsByDays,
+} from "./utils";
 
 interface PowerRadarProps {
   streams: RideStream[];
 }
 
+const REFERENCE_LABEL = (import.meta.env.VITE_POWER_REFERENCE_LABEL as string) ?? "Cat B reference";
+
 export function PowerRadar({ streams }: PowerRadarProps) {
   const [days, setDays] = useState(90);
 
   const allTimeRecords = useMemo(() => computeRecords(streams), [streams]);
-  const filteredStreams = useMemo(() => filterStreamsByDays(streams, days), [streams, days]);
-  const currentRecords = useMemo(() => computeRecords(filteredStreams), [filteredStreams]);
+  const filteredStreams = useMemo(
+    () => filterStreamsByDays(streams, days),
+    [streams, days],
+  );
+  const currentRecords = useMemo(
+    () => computeRecords(filteredStreams),
+    [filteredStreams],
+  );
 
   const chartData = DURATIONS.map(({ key }) => ({
     effort: key,
@@ -42,7 +55,7 @@ export function PowerRadar({ streams }: PowerRadarProps) {
             Power Records
           </h2>
           <p className="text-sm text-text-muted">
-            Best efforts vs all-time — Cat B reference
+            Best efforts vs all-time — {REFERENCE_LABEL}
           </p>
         </div>
         <TimeRangeSelector selected={days} onChange={setDays} />
@@ -74,7 +87,7 @@ export function PowerRadar({ streams }: PowerRadarProps) {
                       All-time: {data?.allTimeWatts}W
                     </p>
                     <p className="text-xs text-text-secondary mt-1">
-                      Cat B: {data?.reference}W
+                      {REFERENCE_LABEL}: {data?.reference}W
                     </p>
                     <p
                       className={`text-xs font-medium ${diff >= 0 ? "text-green-400" : "text-red-400"}`}

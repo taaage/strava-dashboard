@@ -2,6 +2,12 @@ import { type RideStream } from "../../api/api";
 
 export type RideCategory = "Race" | "Tempo" | "Endurance" | "Recovery";
 
+// Override via VITE_CATEGORY_*_MIN_WATTS env vars
+const RACE_MIN = Number(import.meta.env.VITE_CATEGORY_RACE_MIN_WATTS) || 250;
+const TEMPO_MIN = Number(import.meta.env.VITE_CATEGORY_TEMPO_MIN_WATTS) || 200;
+const ENDURANCE_MIN =
+  Number(import.meta.env.VITE_CATEGORY_ENDURANCE_MIN_WATTS) || 150;
+
 export const CATEGORIES: {
   key: RideCategory;
   label: string;
@@ -12,37 +18,37 @@ export const CATEGORIES: {
   {
     key: "Race",
     label: "Race",
-    minWatts: 250,
+    minWatts: RACE_MIN,
     maxWatts: 9999,
     color: "hsl(0, 70%, 55%)",
   },
   {
     key: "Tempo",
     label: "Tempo",
-    minWatts: 200,
-    maxWatts: 250,
+    minWatts: TEMPO_MIN,
+    maxWatts: RACE_MIN,
     color: "hsl(30, 80%, 55%)",
   },
   {
     key: "Endurance",
     label: "Zone 2",
-    minWatts: 150,
-    maxWatts: 200,
+    minWatts: ENDURANCE_MIN,
+    maxWatts: TEMPO_MIN,
     color: "hsl(221, 83%, 53%)",
   },
   {
     key: "Recovery",
     label: "Zzz",
     minWatts: 0,
-    maxWatts: 150,
+    maxWatts: ENDURANCE_MIN,
     color: "hsl(160, 60%, 45%)",
   },
 ];
 
 function categorizeRide(avgWatts: number): RideCategory {
-  if (avgWatts >= 250) return "Race";
-  if (avgWatts >= 200) return "Tempo";
-  if (avgWatts >= 150) return "Endurance";
+  if (avgWatts >= RACE_MIN) return "Race";
+  if (avgWatts >= TEMPO_MIN) return "Tempo";
+  if (avgWatts >= ENDURANCE_MIN) return "Endurance";
   return "Recovery";
 }
 
