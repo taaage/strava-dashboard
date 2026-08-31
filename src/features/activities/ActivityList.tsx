@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { StravaActivity } from "../../api/api";
 import { isRide } from "../../shared/utils";
+import { ActivityFilter, ActivityFilters } from "./ActivityFilters";
 import { ActivityRow } from "./ActivityRow";
-import { ActivityFilters, ActivityFilter } from "./ActivityFilters";
 
 interface ActivityListProps {
   activities: StravaActivity[];
@@ -13,17 +13,24 @@ export function ActivityList({ activities }: ActivityListProps) {
   const [to, setTo] = useState("");
   const [filter, setFilter] = useState<ActivityFilter>("all");
 
-  const rides = activities.filter(isRide).filter((a) => {
-    const date = a.start_date_local.split("T")[0];
-    if (from && date < from) return false;
-    if (to && date > to) return false;
-    if (filter === "races" && (a as any).workout_type !== 11) return false;
-    if (filter === "outdoor" && (a.type === "VirtualRide" || a.trainer))
-      return false;
-    if (filter === "indoor" && a.type !== "VirtualRide" && !a.trainer)
-      return false;
-    return true;
-  });
+  const rides = activities
+    .filter(isRide)
+    .filter((a) => {
+      const date = a.start_date_local.split("T")[0];
+      if (from && date < from) return false;
+      if (to && date > to) return false;
+      if (filter === "races" && (a as any).workout_type !== 11) return false;
+      if (filter === "outdoor" && (a.type === "VirtualRide" || a.trainer))
+        return false;
+      if (filter === "indoor" && a.type !== "VirtualRide" && !a.trainer)
+        return false;
+      return true;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.start_date_local).getTime() -
+        new Date(a.start_date_local).getTime(),
+    );
 
   const hasFilters = from || to || filter !== "all";
 
