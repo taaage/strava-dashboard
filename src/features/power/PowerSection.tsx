@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getRideStreams } from "../../api/api";
 import { PowerRadar } from "./PowerRadar";
+import { FtpHistory } from "./FtpHistory";
 import { Section, CardPlaceholder } from "../../shared";
 
 export function PowerSection() {
@@ -17,8 +18,13 @@ export function PowerSection() {
     );
 
   return (
-    <Section>
-      <PowerRadar streams={streams} />
-    </Section>
+    <>
+      <Section>
+        <PowerRadar streams={streams} />
+      </Section>
+      <Section title="FTP by season — 95% of best 20′">
+        <FtpHistory streams={streams} />
+      </Section>
+    </>
   );
 }
