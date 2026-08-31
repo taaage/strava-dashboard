@@ -1,11 +1,11 @@
 import {
-  AreaChart,
   Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
 } from "recharts";
 import { StravaActivity } from "../../api/api";
 import { ChartCard, useTimeRange } from "../../shared";
@@ -32,7 +32,11 @@ export function EfficiencyAreaChart({ activities }: EfficiencyAreaChartProps) {
         a.average_heartrate > 0 &&
         new Date(a.start_date_local) >= cutoff,
     )
-    .reverse()
+    .sort(
+      (a, b) =>
+        new Date(a.start_date_local).getTime() -
+        new Date(b.start_date_local).getTime(),
+    )
     .map((a) => ({
       id: a.id,
       date: new Date(a.start_date_local).toLocaleDateString("en-GB", {
@@ -58,7 +62,10 @@ export function EfficiencyAreaChart({ activities }: EfficiencyAreaChartProps) {
           onClick={(e) => {
             const point = e?.activePayload?.[0]?.payload;
             if (point?.id) {
-              window.open(`https://www.strava.com/activities/${point.id}`, "_blank");
+              window.open(
+                `https://www.strava.com/activities/${point.id}`,
+                "_blank",
+              );
             }
           }}
           style={{ cursor: "pointer" }}
