@@ -31,6 +31,8 @@ interface ElevationPoint {
 /** Builds the smoothed, downsampled chart series from raw streams. */
 function buildSeries(altitude: number[], distance: number[]): ElevationPoint[] {
   const totalDistance = distance[distance.length - 1] || 1;
+
+  // Smooth the full-resolution altitude first, then downsample for the chart.
   const smoothed = movingAverage(altitude, smoothingWindow(altitude.length));
   const step = Math.max(1, Math.ceil(smoothed.length / MAX_ELEVATION_POINTS));
 

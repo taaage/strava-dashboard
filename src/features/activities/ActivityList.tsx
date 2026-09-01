@@ -56,8 +56,8 @@ export function ActivityList({ activities }: ActivityListProps) {
       <div className="px-5 sm:px-8 pb-2 text-xs text-text-muted">
         {rides.length} rides{hasFilters && " found"}
       </div>
-      <div className="px-4 pb-4 max-h-[600px] overflow-y-auto">
-        {rides.slice(0, 7).map((activity) => (
+      <div className="px-4 pb-4">
+        {rides.map((activity) => (
           <ActivityRow key={activity.id} activity={activity} />
         ))}
       </div>

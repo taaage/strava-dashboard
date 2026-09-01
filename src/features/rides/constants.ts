@@ -27,10 +27,12 @@ export const ELEVATION_COLOR = "hsl(221, 83%, 53%)";
 export const MAX_TRACK_POINTS = 1500; // route polyline
 export const MAX_ELEVATION_POINTS = 400; // elevation chart
 
-// Altitude smoothing (moving average). Window scales with sample density.
-export const SMOOTHING_FRACTION = 0.005; // ~0.5% of samples on each side
-export const SMOOTHING_MIN_WINDOW = 3;
-export const SMOOTHING_MAX_WINDOW = 30;
+// Altitude smoothing (moving average). Window scales with sample density, but
+// has a solid minimum so short rides (few samples) still get smoothed — GPS
+// jitter is per-sample regardless of ride length.
+export const SMOOTHING_FRACTION = 0.01; // ~1% of samples on each side
+export const SMOOTHING_MIN_WINDOW = 10;
+export const SMOOTHING_MAX_WINDOW = 40;
 
 // A ride is considered to have usable GPS with at least this many points.
 export const MIN_GPS_POINTS = 10;
