@@ -44,6 +44,12 @@ function dayOfYear(date: Date): number {
   return Math.floor(diff / 86400000);
 }
 
+// Maps a 1-based day-of-year to a Date in a leap year (2000) so that day 366
+// (Dec 31) is representable. Used only for axis/tooltip labels.
+function dayToLabelDate(day: number): Date {
+  return new Date(2000, 0, day);
+}
+
 // Cumulative distance (km) indexed by day-of-year (1..366).
 // For the current year, days after today are null so the line stops at today.
 function getCumulativeByDay(
@@ -117,15 +123,25 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
     cumulativeByYear[year] = getCumulativeByDay(activities, year);
   });
 
-  // One data point per day of year (index 0 = day 1).
-  const data = Array.from({ length: 366 }, (_, i) => {
-    const day = i + 1;
+  // Sample at ~weekly intervals by day-of-year: day 1, 8, 15, … and always
+  // day 366 (Dec 31), plus today. This keeps the x-axis spanning the full
+  // Jan 1 – Dec 31 range, and the current year's line ends exactly at today.
+  // Day-of-year sampling keeps cross-year comparison fair (same day = same point).
+  const todayOfYear = dayOfYear(now);
+  const sampleDays: number[] = [];
+  for (let d = 1; d <= 366; d += 7) sampleDays.push(d);
+  if (!sampleDays.includes(366)) sampleDays.push(366);
+  if (!sampleDays.includes(todayOfYear)) sampleDays.push(todayOfYear);
+  sampleDays.sort((a, b) => a - b);
+
+  const data = sampleDays.map((day) => {
     const point: any = {
       day,
-      goal: Math.round(goalPerDay * day),
+      goal: Math.round(Math.min(goalPerDay * day, YEARLY_GOAL)),
     };
     selectedYears.forEach((year) => {
-      point[year.toString()] = cumulativeByYear[year][i];
+      // cumulative array is 0-indexed by (day - 1)
+      point[year.toString()] = cumulativeByYear[year][day - 1];
     });
     return point;
   });
@@ -168,8 +184,8 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
               dataKey="day"
               type="number"
               domain={[1, 366]}
-              ticks={[1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]}
-              tickFormatter={(day) => MONTHS[new Date(2001, 0, day).getMonth()]}
+              ticks={[1, 32, 61, 92, 122, 153, 183, 214, 245, 275, 306, 336]}
+              tickFormatter={(day) => MONTHS[dayToLabelDate(day).getMonth()]}
               axisLine={false}
               tickLine={false}
               tick={{ fill: "#71717a", fontSize: 11 }}
@@ -186,9 +202,7 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
             <Tooltip
               content={({ active, payload, label }) => {
                 if (!active || !payload?.length) return null;
-                const dateLabel = new Date(
-                  2001,
-                  0,
+                const dateLabel = dayToLabelDate(
                   Number(label),
                 ).toLocaleDateString("en-GB", {
                   day: "numeric",
