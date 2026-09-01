@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getRideDetails } from "../../api/api";
 import { RideMap } from "./RideMap";
@@ -8,6 +9,7 @@ interface RideDetailPanelProps {
 }
 
 export function RideDetailPanel({ activityId }: RideDetailPanelProps) {
+  const [hoverFraction, setHoverFraction] = useState<number | null>(null);
   // ride-details is one cached blob; look up this ride by id.
   const { data: rides = [], isLoading } = useQuery({
     queryKey: ["rideDetails"],
@@ -38,7 +40,11 @@ export function RideDetailPanel({ activityId }: RideDetailPanelProps) {
   return (
     <div className="px-4 pt-3 pb-4 space-y-4">
       {hasGps ? (
-        <RideMap latlng={ride.streams.latlng!} height={440} />
+        <RideMap
+          latlng={ride.streams.latlng!}
+          height={440}
+          hoverFraction={hoverFraction}
+        />
       ) : (
         <div className="flex items-center justify-center h-24 text-sm text-text-muted rounded-2xl border border-surface-border">
           No GPS data (indoor ride)
@@ -54,6 +60,7 @@ export function RideDetailPanel({ activityId }: RideDetailPanelProps) {
             altitude={ride.streams.altitude!}
             distance={ride.streams.distance!}
             height={120}
+            onHoverFraction={setHoverFraction}
           />
         </div>
       )}

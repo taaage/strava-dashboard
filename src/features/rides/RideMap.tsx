@@ -7,6 +7,8 @@ interface RideMapProps {
   // Strava streams are [lat, lng] — same order Leaflet expects.
   latlng: [number, number][];
   height?: number;
+  // Position along the track to highlight (0..1), synced from the elevation chart.
+  hoverFraction?: number | null;
 }
 
 // Keyless OpenStreetMap tiles — darkened via CSS filter (index.css).
@@ -15,7 +17,7 @@ const OSM_TILES = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 const OSM_ATTR =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-export function RideMap({ latlng, height = 320 }: RideMapProps) {
+export function RideMap({ latlng, height = 320, hoverFraction }: RideMapProps) {
   const { positions, bounds, start, end } = useMemo(() => {
     if (!latlng || latlng.length < 2) {
       return { positions: [], bounds: null, start: null, end: null };
@@ -48,6 +50,21 @@ export function RideMap({ latlng, height = 320 }: RideMapProps) {
       end: pts[pts.length - 1] as LatLngExpression,
     };
   }, [latlng]);
+
+  // Map the hover fraction (0..1) to a coordinate in the full track.
+  const hoverPoint = useMemo(() => {
+    if (
+      hoverFraction == null ||
+      !latlng ||
+      latlng.length === 0 ||
+      Number.isNaN(hoverFraction)
+    ) {
+      return null;
+    }
+    const clamped = Math.min(1, Math.max(0, hoverFraction));
+    const idx = Math.round(clamped * (latlng.length - 1));
+    return latlng[idx] as LatLngExpression;
+  }, [hoverFraction, latlng]);
 
   if (!bounds) {
     return (
@@ -101,6 +118,18 @@ export function RideMap({ latlng, height = 320 }: RideMapProps) {
               color: "#ffffff",
               weight: 2,
               fillColor: "#E01B24",
+              fillOpacity: 1,
+            }}
+          />
+        )}
+        {hoverPoint && (
+          <CircleMarker
+            center={hoverPoint}
+            radius={7}
+            pathOptions={{
+              color: "#ffffff",
+              weight: 2,
+              fillColor: "#FC4C02",
               fillOpacity: 1,
             }}
           />
