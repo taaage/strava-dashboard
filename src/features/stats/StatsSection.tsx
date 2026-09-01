@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getStats, getActivities } from "../../api/api";
+import { queryKeys } from "../../api/queryKeys";
 import {
   formatDistance,
   formatDuration,
@@ -8,9 +9,12 @@ import {
 import { StatCard, CardPlaceholder, Section, StatsGrid } from "../../shared";
 
 export function StatsSection() {
-  const { data: stats } = useQuery({ queryKey: ["stats"], queryFn: getStats });
+  const { data: stats } = useQuery({
+    queryKey: queryKeys.stats,
+    queryFn: getStats,
+  });
   const { data: activities = [] } = useQuery({
-    queryKey: ["activities"],
+    queryKey: queryKeys.activities,
     queryFn: getActivities,
   });
 

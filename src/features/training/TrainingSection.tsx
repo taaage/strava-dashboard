@@ -1,16 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { getActivities, getAthlete } from "../../api/api";
+import { queryKeys } from "../../api/queryKeys";
 import { CardPlaceholder, Section } from "../../shared";
 import { EfficiencyAreaChart } from "./EfficiencyChart";
 import { WeeklyTSSChart } from "./WeeklyTSSChart";
 
 export function TrainingSection() {
   const { data: activities = [] } = useQuery({
-    queryKey: ["activities"],
+    queryKey: queryKeys.activities,
     queryFn: getActivities,
   });
   const { data: athlete } = useQuery({
-    queryKey: ["athlete"],
+    queryKey: queryKeys.athlete,
     queryFn: getAthlete,
   });
 

@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { getActivities } from "../../api/api";
+import { queryKeys } from "../../api/queryKeys";
 import { ActivityList } from "./ActivityList";
 import { Section, CardPlaceholder } from "../../shared";
 
 export function ActivitiesSection() {
   const { data: activities = [] } = useQuery({
-    queryKey: ["activities"],
+    queryKey: queryKeys.activities,
     queryFn: getActivities,
   });
 

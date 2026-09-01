@@ -1,14 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { getActivities, getStats } from "../../api/api";
+import { queryKeys } from "../../api/queryKeys";
 import { GoalsSection as Goals } from "./GoalsSection";
 import { YearProgressChart } from "./YearProgressChart";
 import { WeeklyAreaChart } from "../training/WeeklyDistanceChart";
 import { Section, CardPlaceholder } from "../../shared";
 
 export function OverviewSection() {
-  const { data: stats } = useQuery({ queryKey: ["stats"], queryFn: getStats });
+  const { data: stats } = useQuery({
+    queryKey: queryKeys.stats,
+    queryFn: getStats,
+  });
   const { data: activities = [] } = useQuery({
-    queryKey: ["activities"],
+    queryKey: queryKeys.activities,
     queryFn: getActivities,
   });
 

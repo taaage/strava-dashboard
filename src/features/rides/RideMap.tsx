@@ -2,71 +2,80 @@ import { useMemo } from "react";
 import { MapContainer, TileLayer, Polyline, CircleMarker } from "react-leaflet";
 import type { LatLngBoundsExpression, LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
+import {
+  DEFAULT_MAP_HEIGHT,
+  FINISH_COLOR,
+  HOVER_MARKER_RADIUS,
+  MAP_BACKGROUND,
+  MAP_FIT_PADDING,
+  MARKER_RADIUS,
+  MARKER_STROKE,
+  MARKER_STROKE_WIDTH,
+  MAX_TRACK_POINTS,
+  ROUTE_COLOR,
+  ROUTE_WEIGHT,
+  START_COLOR,
+  TILE_ATTRIBUTION,
+  TILE_URL,
+} from "./constants";
+import { boundsOf, downsample, pointAtFraction, type LatLng } from "./utils";
 
 interface RideMapProps {
   // Strava streams are [lat, lng] — same order Leaflet expects.
-  latlng: [number, number][];
+  latlng: LatLng[];
   height?: number;
   // Position along the track to highlight (0..1), synced from the elevation chart.
   hoverFraction?: number | null;
 }
 
-// Keyless OpenStreetMap tiles — darkened via CSS filter (index.css).
-// No API key or account needed; full color control in the browser.
-const OSM_TILES = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-const OSM_ATTR =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+/** A filled circle marker with a white ring, used for start/finish/hover. */
+function Dot({
+  center,
+  color,
+  radius = MARKER_RADIUS,
+}: {
+  center: LatLngExpression;
+  color: string;
+  radius?: number;
+}) {
+  return (
+    <CircleMarker
+      center={center}
+      radius={radius}
+      pathOptions={{
+        color: MARKER_STROKE,
+        weight: MARKER_STROKE_WIDTH,
+        fillColor: color,
+        fillOpacity: 1,
+      }}
+    />
+  );
+}
 
-export function RideMap({ latlng, height = 320, hoverFraction }: RideMapProps) {
-  const { positions, bounds, start, end } = useMemo(() => {
-    if (!latlng || latlng.length < 2) {
-      return { positions: [], bounds: null, start: null, end: null };
-    }
-
-    // Downsample to ~1500 points for a light polyline.
-    const step = Math.max(1, Math.ceil(latlng.length / 1500));
-    const pts: [number, number][] = [];
-    for (let i = 0; i < latlng.length; i += step) pts.push(latlng[i]);
-    pts.push(latlng[latlng.length - 1]);
-
-    let minLat = Infinity,
-      maxLat = -Infinity,
-      minLng = Infinity,
-      maxLng = -Infinity;
-    for (const [lat, lng] of pts) {
-      if (lat < minLat) minLat = lat;
-      if (lat > maxLat) maxLat = lat;
-      if (lng < minLng) minLng = lng;
-      if (lng > maxLng) maxLng = lng;
-    }
-
+export function RideMap({
+  latlng,
+  height = DEFAULT_MAP_HEIGHT,
+  hoverFraction,
+}: RideMapProps) {
+  const track = useMemo(() => {
+    if (!latlng || latlng.length < 2) return null;
+    const points = downsample(latlng, MAX_TRACK_POINTS);
+    const bounds = boundsOf(points);
+    if (!bounds) return null;
     return {
-      positions: pts as LatLngExpression[],
-      bounds: [
-        [minLat, minLng],
-        [maxLat, maxLng],
-      ] as LatLngBoundsExpression,
-      start: pts[0] as LatLngExpression,
-      end: pts[pts.length - 1] as LatLngExpression,
+      points: points as LatLngExpression[],
+      bounds: bounds as LatLngBoundsExpression,
+      start: points[0] as LatLngExpression,
+      end: points[points.length - 1] as LatLngExpression,
     };
   }, [latlng]);
 
-  // Map the hover fraction (0..1) to a coordinate in the full track.
-  const hoverPoint = useMemo(() => {
-    if (
-      hoverFraction == null ||
-      !latlng ||
-      latlng.length === 0 ||
-      Number.isNaN(hoverFraction)
-    ) {
-      return null;
-    }
-    const clamped = Math.min(1, Math.max(0, hoverFraction));
-    const idx = Math.round(clamped * (latlng.length - 1));
-    return latlng[idx] as LatLngExpression;
-  }, [hoverFraction, latlng]);
+  const hoverPoint = useMemo(
+    () => pointAtFraction(latlng, hoverFraction) as LatLngExpression | null,
+    [latlng, hoverFraction],
+  );
 
-  if (!bounds) {
+  if (!track) {
     return (
       <div
         className="flex items-center justify-center text-sm text-text-muted"
@@ -83,55 +92,27 @@ export function RideMap({ latlng, height = 320, hoverFraction }: RideMapProps) {
       style={{ height }}
     >
       <MapContainer
-        bounds={bounds}
-        boundsOptions={{ padding: [24, 24] }}
+        bounds={track.bounds}
+        boundsOptions={{ padding: [MAP_FIT_PADDING, MAP_FIT_PADDING] }}
         scrollWheelZoom={false}
-        attributionControl={true}
-        style={{ width: "100%", height: "100%", background: "#18181b" }}
+        style={{ width: "100%", height: "100%", background: MAP_BACKGROUND }}
       >
         <TileLayer
-          url={OSM_TILES}
-          attribution={OSM_ATTR}
+          url={TILE_URL}
+          attribution={TILE_ATTRIBUTION}
           className="ride-map-tiles"
         />
         <Polyline
-          positions={positions}
-          pathOptions={{ color: "#FC4C02", weight: 3 }}
+          positions={track.points}
+          pathOptions={{ color: ROUTE_COLOR, weight: ROUTE_WEIGHT }}
         />
-        {start && (
-          <CircleMarker
-            center={start}
-            radius={6}
-            pathOptions={{
-              color: "#ffffff",
-              weight: 2,
-              fillColor: "#00B21E",
-              fillOpacity: 1,
-            }}
-          />
-        )}
-        {end && (
-          <CircleMarker
-            center={end}
-            radius={6}
-            pathOptions={{
-              color: "#ffffff",
-              weight: 2,
-              fillColor: "#E01B24",
-              fillOpacity: 1,
-            }}
-          />
-        )}
+        <Dot center={track.start} color={START_COLOR} />
+        <Dot center={track.end} color={FINISH_COLOR} />
         {hoverPoint && (
-          <CircleMarker
+          <Dot
             center={hoverPoint}
-            radius={7}
-            pathOptions={{
-              color: "#ffffff",
-              weight: 2,
-              fillColor: "#FC4C02",
-              fillOpacity: 1,
-            }}
+            color={ROUTE_COLOR}
+            radius={HOVER_MARKER_RADIUS}
           />
         )}
       </MapContainer>

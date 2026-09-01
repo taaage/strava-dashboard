@@ -1,17 +1,18 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getRideStreams, getAthleteZones } from "../../api/api";
+import { queryKeys } from "../../api/queryKeys";
 import { PowerZoneChart, HRZoneChart } from "./ZoneCharts";
 import { Section, CardPlaceholder } from "../../shared";
 import { computePowerZones, computeHrZones, filterStreamsByDays } from "./utils";
 
 export function ZonesSection() {
   const { data: streams = [] } = useQuery({
-    queryKey: ["rideStreams"],
+    queryKey: queryKeys.rideStreams,
     queryFn: getRideStreams,
   });
   const { data: athleteZones } = useQuery({
-    queryKey: ["athleteZones"],
+    queryKey: queryKeys.athleteZones,
     queryFn: getAthleteZones,
   });
 

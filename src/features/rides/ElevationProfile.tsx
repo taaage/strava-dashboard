@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   Area,
   AreaChart,
@@ -6,27 +7,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
-/**
- * Moving-average smoothing to remove GPS/barometric altitude jitter.
- * `window` is the half-width in samples (total window = 2*window + 1).
- */
-function smooth(values: number[], window: number): number[] {
-  if (window < 1) return values;
-  const out = new Array(values.length);
-  for (let i = 0; i < values.length; i++) {
-    let sum = 0;
-    let count = 0;
-    const lo = Math.max(0, i - window);
-    const hi = Math.min(values.length - 1, i + window);
-    for (let j = lo; j <= hi; j++) {
-      sum += values[j];
-      count++;
-    }
-    out[i] = sum / count;
-  }
-  return out;
-}
+import {
+  DEFAULT_ELEVATION_HEIGHT,
+  ELEVATION_COLOR,
+  MAX_ELEVATION_POINTS,
+} from "./constants";
+import { movingAverage, smoothingWindow } from "./utils";
 
 interface ElevationProfileProps {
   altitude: number[];
@@ -36,6 +22,29 @@ interface ElevationProfileProps {
   onHoverFraction?: (fraction: number | null) => void;
 }
 
+interface ElevationPoint {
+  km: number;
+  alt: number;
+  fraction: number;
+}
+
+/** Builds the smoothed, downsampled chart series from raw streams. */
+function buildSeries(altitude: number[], distance: number[]): ElevationPoint[] {
+  const totalDistance = distance[distance.length - 1] || 1;
+  const smoothed = movingAverage(altitude, smoothingWindow(altitude.length));
+  const step = Math.max(1, Math.ceil(smoothed.length / MAX_ELEVATION_POINTS));
+
+  const series: ElevationPoint[] = [];
+  for (let i = 0; i < smoothed.length; i += step) {
+    series.push({
+      km: Math.round((distance[i] / 1000) * 10) / 10,
+      alt: Math.round(smoothed[i]),
+      fraction: distance[i] / totalDistance,
+    });
+  }
+  return series;
+}
+
 /**
  * Elevation vs. distance area chart, styled like the dashboard's other charts.
  * Reports hover position as a 0..1 fraction so a synced map marker can follow.
@@ -43,28 +52,18 @@ interface ElevationProfileProps {
 export function ElevationProfile({
   altitude,
   distance,
-  height = 140,
+  height = DEFAULT_ELEVATION_HEIGHT,
   onHoverFraction,
 }: ElevationProfileProps) {
-  if (!altitude?.length || !distance?.length) return null;
+  const data = useMemo(
+    () =>
+      altitude?.length && distance?.length
+        ? buildSeries(altitude, distance)
+        : [],
+    [altitude, distance],
+  );
 
-  const maxDist = distance[distance.length - 1] || 1;
-
-  // Smooth altitude to remove jitter. Window scales with sample density
-  // (~0.5% of points each side), clamped to a sensible range.
-  const window = Math.min(30, Math.max(3, Math.round(altitude.length * 0.005)));
-  const smoothed = smooth(altitude, window);
-
-  // Downsample to ~400 points for a smooth, light chart.
-  const step = Math.max(1, Math.ceil(altitude.length / 400));
-  const data: { km: number; alt: number; fraction: number }[] = [];
-  for (let i = 0; i < smoothed.length; i += step) {
-    data.push({
-      km: Math.round((distance[i] / 1000) * 10) / 10,
-      alt: Math.round(smoothed[i]),
-      fraction: distance[i] / maxDist,
-    });
-  }
+  if (data.length === 0) return null;
 
   return (
     <div style={{ height }}>
@@ -72,17 +71,16 @@ export function ElevationProfile({
         <AreaChart
           data={data}
           onMouseMove={(state: any) => {
-            if (onHoverFraction && state?.isTooltipActive) {
-              const f = state.activePayload?.[0]?.payload?.fraction;
-              if (typeof f === "number") onHoverFraction(f);
-            }
+            if (!onHoverFraction || !state?.isTooltipActive) return;
+            const fraction = state.activePayload?.[0]?.payload?.fraction;
+            if (typeof fraction === "number") onHoverFraction(fraction);
           }}
           onMouseLeave={() => onHoverFraction?.(null)}
         >
           <defs>
             <linearGradient id="colorElevation" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.35} />
-              <stop offset="100%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.02} />
+              <stop offset="0%" stopColor={ELEVATION_COLOR} stopOpacity={0.35} />
+              <stop offset="100%" stopColor={ELEVATION_COLOR} stopOpacity={0.02} />
             </linearGradient>
           </defs>
           <XAxis
@@ -106,11 +104,11 @@ export function ElevationProfile({
           <Tooltip
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null;
-              const d = payload[0]?.payload;
+              const point = payload[0]?.payload as ElevationPoint;
               return (
                 <div className="bg-surface-muted rounded-lg px-3 py-2 border border-surface-border shadow-xl">
-                  <p className="text-xs text-text-secondary">{d?.km} km</p>
-                  <p className="text-sm font-medium text-white">{d?.alt} m</p>
+                  <p className="text-xs text-text-secondary">{point.km} km</p>
+                  <p className="text-sm font-medium text-white">{point.alt} m</p>
                 </div>
               );
             }}
@@ -118,7 +116,7 @@ export function ElevationProfile({
           <Area
             type="monotone"
             dataKey="alt"
-            stroke="hsl(221, 83%, 53%)"
+            stroke={ELEVATION_COLOR}
             strokeWidth={1.5}
             fill="url(#colorElevation)"
           />

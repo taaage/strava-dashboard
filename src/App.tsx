@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAthlete } from "./api/api";
+import { queryKeys } from "./api/queryKeys";
 import { ActivitiesSection } from "./features/activities/ActivitiesSection";
 import { BikeCard } from "./features/overview/BikeCard";
 import { OverviewSection } from "./features/overview/OverviewSection";
@@ -11,7 +12,7 @@ import { ZonesSection } from "./features/zones/ZonesSection";
 
 export default function App() {
   const { data: athlete } = useQuery({
-    queryKey: ["athlete"],
+    queryKey: queryKeys.athlete,
     queryFn: getAthlete,
   });
 

@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { getRideStreams } from "../../api/api";
+import { queryKeys } from "../../api/queryKeys";
 import { PowerRadar } from "./PowerRadar";
 import { FtpHistory } from "./FtpHistory";
 import { Section, CardPlaceholder } from "../../shared";
 
 export function PowerSection() {
   const { data: streams = [] } = useQuery({
-    queryKey: ["rideStreams"],
+    queryKey: queryKeys.rideStreams,
     queryFn: getRideStreams,
   });
 

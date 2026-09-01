@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { getRideStreams } from "../../api/api";
+import { queryKeys } from "../../api/queryKeys";
 import { PowerCurve } from "./PowerCurve";
 import { HrVsPowerChart, CadenceDistribution } from "./StreamCharts";
 import { Section, CardPlaceholder } from "../../shared";
 
 export function StreamsSection() {
   const { data: streams = [] } = useQuery({
-    queryKey: ["rideStreams"],
+    queryKey: queryKeys.rideStreams,
     queryFn: getRideStreams,
   });
 
