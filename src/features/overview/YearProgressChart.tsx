@@ -38,15 +38,23 @@ const YEAR_COLORS = [
   "#8FD4B4",
 ];
 
-function getCumulativeByMonth(
+function dayOfYear(date: Date): number {
+  const start = new Date(date.getFullYear(), 0, 0);
+  const diff = date.getTime() - start.getTime();
+  return Math.floor(diff / 86400000);
+}
+
+// Cumulative distance (km) indexed by day-of-year (1..366).
+// For the current year, days after today are null so the line stops at today.
+function getCumulativeByDay(
   activities: StravaActivity[],
   year: number,
 ): (number | null)[] {
   const now = new Date();
   const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
+  const todayOfYear = dayOfYear(now);
 
-  const monthly = new Array(12).fill(0);
+  const daily = new Array(367).fill(0);
 
   activities
     .filter((a) => {
@@ -58,15 +66,15 @@ function getCumulativeByMonth(
       return isRide && date.getFullYear() === year;
     })
     .forEach((a) => {
-      const month = new Date(a.start_date_local).getMonth();
-      monthly[month] += a.distance / 1000;
+      const day = dayOfYear(new Date(a.start_date_local));
+      daily[day] += a.distance / 1000;
     });
 
   const cumulative: (number | null)[] = [];
   let total = 0;
-  for (let i = 0; i < 12; i++) {
-    total += monthly[i];
-    if (year === currentYear && i > currentMonth) {
+  for (let d = 1; d <= 366; d++) {
+    total += daily[d];
+    if (year === currentYear && d > todayOfYear) {
       cumulative.push(null);
     } else {
       cumulative.push(Math.round(total));
@@ -100,14 +108,24 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
     );
   };
 
-  const goalPace = MONTHS.map((_, i) =>
-    Math.round((YEARLY_GOAL / 12) * (i + 1)),
-  );
+  // Cumulative daily goal pace (km) — linear toward the yearly goal.
+  const goalPerDay = YEARLY_GOAL / 365;
 
-  const data = MONTHS.map((month, i) => {
-    const point: any = { month, goal: goalPace[i] };
+  // Precompute cumulative-by-day for each selected year.
+  const cumulativeByYear: Record<number, (number | null)[]> = {};
+  selectedYears.forEach((year) => {
+    cumulativeByYear[year] = getCumulativeByDay(activities, year);
+  });
+
+  // One data point per day of year (index 0 = day 1).
+  const data = Array.from({ length: 366 }, (_, i) => {
+    const day = i + 1;
+    const point: any = {
+      day,
+      goal: Math.round(goalPerDay * day),
+    };
     selectedYears.forEach((year) => {
-      point[year.toString()] = getCumulativeByMonth(activities, year)[i];
+      point[year.toString()] = cumulativeByYear[year][i];
     });
     return point;
   });
@@ -147,7 +165,11 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
             <XAxis
-              dataKey="month"
+              dataKey="day"
+              type="number"
+              domain={[1, 366]}
+              ticks={[1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]}
+              tickFormatter={(day) => MONTHS[new Date(2001, 0, day).getMonth()]}
               axisLine={false}
               tickLine={false}
               tick={{ fill: "#71717a", fontSize: 11 }}
@@ -164,9 +186,19 @@ export function YearProgressChart({ activities }: YearProgressChartProps) {
             <Tooltip
               content={({ active, payload, label }) => {
                 if (!active || !payload?.length) return null;
+                const dateLabel = new Date(
+                  2001,
+                  0,
+                  Number(label),
+                ).toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                });
                 return (
                   <div className="bg-surface-muted rounded-lg px-3 py-2 border border-surface-border shadow-xl">
-                    <p className="text-xs text-text-secondary mb-1">{label}</p>
+                    <p className="text-xs text-text-secondary mb-1">
+                      {dateLabel}
+                    </p>
                     {payload.map(
                       (entry: any) =>
                         entry.value !== null && (
