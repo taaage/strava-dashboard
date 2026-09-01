@@ -28,19 +28,19 @@ export function FtpHistory({ streams }: FtpHistoryProps) {
   if (data.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="flex gap-2">
       {data.map((d) => (
         <a
           key={d.year}
           href={`https://www.strava.com/activities/${d.activityId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-surface-card rounded-3xl p-6 border border-surface-border hover:bg-surface-muted transition-colors text-center"
+          className="flex-1 bg-surface-card rounded-2xl p-3 border border-surface-border hover:bg-surface-muted transition-colors text-center"
         >
-          <p className="text-sm font-medium text-text-muted mb-2">{d.year}</p>
-          <p className="text-2xl font-semibold text-text-primary">
+          <p className="text-xs font-medium text-text-muted mb-1">{d.year}</p>
+          <p className="text-base sm:text-lg font-semibold text-text-primary">
             {d.ftp}
-            <span className="text-sm font-normal text-text-muted">W</span>
+            <span className="text-xs font-normal text-text-muted">W</span>
           </p>
         </a>
       ))}
