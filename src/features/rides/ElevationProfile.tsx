@@ -7,6 +7,27 @@ import {
   YAxis,
 } from "recharts";
 
+/**
+ * Moving-average smoothing to remove GPS/barometric altitude jitter.
+ * `window` is the half-width in samples (total window = 2*window + 1).
+ */
+function smooth(values: number[], window: number): number[] {
+  if (window < 1) return values;
+  const out = new Array(values.length);
+  for (let i = 0; i < values.length; i++) {
+    let sum = 0;
+    let count = 0;
+    const lo = Math.max(0, i - window);
+    const hi = Math.min(values.length - 1, i + window);
+    for (let j = lo; j <= hi; j++) {
+      sum += values[j];
+      count++;
+    }
+    out[i] = sum / count;
+  }
+  return out;
+}
+
 interface ElevationProfileProps {
   altitude: number[];
   distance: number[];
@@ -29,13 +50,18 @@ export function ElevationProfile({
 
   const maxDist = distance[distance.length - 1] || 1;
 
+  // Smooth altitude to remove jitter. Window scales with sample density
+  // (~0.5% of points each side), clamped to a sensible range.
+  const window = Math.min(30, Math.max(3, Math.round(altitude.length * 0.005)));
+  const smoothed = smooth(altitude, window);
+
   // Downsample to ~400 points for a smooth, light chart.
   const step = Math.max(1, Math.ceil(altitude.length / 400));
   const data: { km: number; alt: number; fraction: number }[] = [];
-  for (let i = 0; i < altitude.length; i += step) {
+  for (let i = 0; i < smoothed.length; i += step) {
     data.push({
       km: Math.round((distance[i] / 1000) * 10) / 10,
-      alt: Math.round(altitude[i]),
+      alt: Math.round(smoothed[i]),
       fraction: distance[i] / maxDist,
     });
   }
