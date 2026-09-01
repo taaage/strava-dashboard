@@ -9,12 +9,11 @@ interface RideMapProps {
   height?: number;
 }
 
-// CARTO dark basemap (no labels) — clean, minimalist dark style.
-// Key is read from env; CARTO basemap keys are public (used in client tile URLs).
-const CARTO_KEY = import.meta.env.VITE_CARTO_API_KEY as string;
-const CARTO_DARK = `https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png?api_key=${CARTO_KEY}`;
-const CARTO_ATTR =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+// Keyless OpenStreetMap tiles — darkened via CSS filter (index.css).
+// No API key or account needed; full color control in the browser.
+const OSM_TILES = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+const OSM_ATTR =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 export function RideMap({ latlng, height = 320 }: RideMapProps) {
   const { positions, bounds, start, end } = useMemo(() => {
@@ -70,22 +69,26 @@ export function RideMap({ latlng, height = 320 }: RideMapProps) {
         bounds={bounds}
         boundsOptions={{ padding: [24, 24] }}
         scrollWheelZoom={false}
-        attributionControl={false}
+        attributionControl={true}
         style={{ width: "100%", height: "100%", background: "#18181b" }}
       >
-        <TileLayer url={CARTO_DARK} attribution={CARTO_ATTR} />
+        <TileLayer
+          url={OSM_TILES}
+          attribution={OSM_ATTR}
+          className="ride-map-tiles"
+        />
         <Polyline
           positions={positions}
-          pathOptions={{ color: "hsl(221, 83%, 53%)", weight: 3 }}
+          pathOptions={{ color: "#FC4C02", weight: 3 }}
         />
         {start && (
           <CircleMarker
             center={start}
-            radius={5}
+            radius={6}
             pathOptions={{
-              color: "#18181b",
+              color: "#ffffff",
               weight: 2,
-              fillColor: "hsl(160, 60%, 45%)",
+              fillColor: "#00B21E",
               fillOpacity: 1,
             }}
           />
@@ -93,11 +96,11 @@ export function RideMap({ latlng, height = 320 }: RideMapProps) {
         {end && (
           <CircleMarker
             center={end}
-            radius={5}
+            radius={6}
             pathOptions={{
-              color: "#18181b",
+              color: "#ffffff",
               weight: 2,
-              fillColor: "hsl(0, 70%, 55%)",
+              fillColor: "#E01B24",
               fillOpacity: 1,
             }}
           />

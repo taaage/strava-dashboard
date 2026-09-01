@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -11,6 +11,21 @@ body {
 /* Leaflet controls on dark background */
 .leaflet-container {
   background: #18181b;
+}
+/* "Dark but colorful" map from keyless OSM tiles.
+   invert + hue-rotate(180) flips light->dark while restoring original hues
+   (green land, blue water) on a dark base. Tune the values below to taste. */
+.ride-map-tiles {
+  filter: invert(1) hue-rotate(180deg) brightness(0.95) saturate(0.35)
+    contrast(0.95);
+}
+.leaflet-control-attribution {
+  background: rgba(24, 24, 27, 0.7) !important;
+  color: #71717a !important;
+  font-size: 10px;
+}
+.leaflet-control-attribution a {
+  color: #a1a1aa !important;
 }
 .leaflet-control-zoom a {
   background: #27272a;

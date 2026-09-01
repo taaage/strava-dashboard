@@ -57,7 +57,7 @@ export function ElevationProfile({
             axisLine={false}
             tickLine={false}
             tick={{ fill: "#71717a", fontSize: 10 }}
-            domain={["dataMin", "dataMax"]}
+            domain={[(min: number) => Math.max(0, Math.floor(min)), "dataMax"]}
             tickFormatter={(v) => `${v}m`}
             width={40}
           />
