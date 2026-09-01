@@ -128,3 +128,42 @@ export function getRideStreams(): Promise<RideStream[]> {
 export function getAthleteZones(): Promise<AthleteZones | null> {
   return apiFetch("/api/athlete-zones", null);
 }
+
+export interface SegmentEffortSummary {
+  id: number;
+  segmentId: number;
+  name: string;
+  elapsedTime: number;
+  movingTime: number;
+  distance: number;
+  averageWatts: number | null;
+  prRank: number | null;
+  komRank: number | null;
+}
+
+export interface RideDetail {
+  activityId: number;
+  date: string;
+  name: string;
+  type: string;
+  distance: number;
+  movingTime: number;
+  totalElevationGain: number;
+  map: {
+    polyline: string | null;
+    summaryPolyline: string | null;
+  };
+  streams: {
+    time: number[] | null;
+    latlng: [number, number][] | null;
+    altitude: number[] | null;
+    distance: number[] | null;
+    velocity: number[] | null;
+    grade: number[] | null;
+  };
+  segmentEfforts: SegmentEffortSummary[];
+}
+
+export function getRideDetails(): Promise<RideDetail[]> {
+  return apiFetch("/api/ride-details", []);
+}
