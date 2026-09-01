@@ -28,14 +28,14 @@ export function FtpHistory({ streams }: FtpHistoryProps) {
   if (data.length === 0) return null;
 
   return (
-    <div className="flex justify-between gap-3">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       {data.map((d) => (
         <a
           key={d.year}
           href={`https://www.strava.com/activities/${d.activityId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-surface-card rounded-3xl p-6 border border-surface-border hover:bg-surface-muted transition-colors text-center flex-1"
+          className="bg-surface-card rounded-3xl p-6 border border-surface-border hover:bg-surface-muted transition-colors text-center"
         >
           <p className="text-sm font-medium text-text-muted mb-2">{d.year}</p>
           <p className="text-2xl font-semibold text-text-primary">
