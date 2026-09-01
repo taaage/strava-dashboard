@@ -9,11 +9,12 @@ interface RideMapProps {
   height?: number;
 }
 
-// Keyless OpenStreetMap tiles, darkened via CSS filter (see index.css).
-// Avoids any API-key-gated tile provider (CARTO/Mapbox now require keys).
-const OSM_TILES = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-const OSM_ATTR =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+// CARTO dark basemap (no labels) — clean, minimalist dark style.
+// Key is read from env; CARTO basemap keys are public (used in client tile URLs).
+const CARTO_KEY = import.meta.env.VITE_CARTO_API_KEY as string;
+const CARTO_DARK = `https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png?api_key=${CARTO_KEY}`;
+const CARTO_ATTR =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
 export function RideMap({ latlng, height = 320 }: RideMapProps) {
   const { positions, bounds, start, end } = useMemo(() => {
@@ -72,11 +73,7 @@ export function RideMap({ latlng, height = 320 }: RideMapProps) {
         attributionControl={false}
         style={{ width: "100%", height: "100%", background: "#18181b" }}
       >
-        <TileLayer
-          url={OSM_TILES}
-          attribution={OSM_ATTR}
-          className="ride-map-tiles-dark"
-        />
+        <TileLayer url={CARTO_DARK} attribution={CARTO_ATTR} />
         <Polyline
           positions={positions}
           pathOptions={{ color: "hsl(221, 83%, 53%)", weight: 3 }}

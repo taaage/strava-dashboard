@@ -8,12 +8,6 @@ body {
   @apply bg-background text-text-primary font-sans antialiased min-h-screen;
 }
 
-/* Darken OSM raster tiles to match the dashboard theme (keyless dark map). */
-.ride-map-tiles-dark {
-  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.85)
-    saturate(0.6);
-}
-
 /* Leaflet controls on dark background */
 .leaflet-container {
   background: #18181b;
