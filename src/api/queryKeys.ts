@@ -5,5 +5,6 @@ export const queryKeys = {
   activities: ["activities"] as const,
   rideStreams: ["rideStreams"] as const,
   rideDetails: ["rideDetails"] as const,
+  rideDetail: (activityId: number) => ["rideDetail", activityId] as const,
   athleteZones: ["athleteZones"] as const,
 };

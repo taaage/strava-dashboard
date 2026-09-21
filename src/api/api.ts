@@ -167,3 +167,7 @@ export interface RideDetail {
 export function getRideDetails(): Promise<RideDetail[]> {
   return apiFetch("/api/ride-details", []);
 }
+
+export function getRideDetail(activityId: number): Promise<RideDetail | null> {
+  return apiFetch(`/api/ride-details/${activityId}`, null);
+}

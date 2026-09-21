@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getRideDetails } from "../../api/api";
+import { getRideDetail } from "../../api/api";
 import { queryKeys } from "../../api/queryKeys";
 import { RideMap } from "./RideMap";
 import { ElevationProfile } from "./ElevationProfile";
@@ -23,13 +23,11 @@ function PanelMessage({ children }: { children: React.ReactNode }) {
 export function RideDetailPanel({ activityId }: RideDetailPanelProps) {
   const [hoverFraction, setHoverFraction] = useState<number | null>(null);
 
-  // ride-details is one cached blob; look up this ride by id.
-  const { data: rides = [], isLoading } = useQuery({
-    queryKey: queryKeys.rideDetails,
-    queryFn: getRideDetails,
+  // Fetch only this ride's detail (incl. streams) instead of the whole history.
+  const { data: ride, isLoading } = useQuery({
+    queryKey: queryKeys.rideDetail(activityId),
+    queryFn: () => getRideDetail(activityId),
   });
-
-  const ride = rides.find((r) => r.activityId === activityId);
 
   if (isLoading) return <PanelMessage>Loading details…</PanelMessage>;
   if (!ride) return <PanelMessage>No detailed data for this ride.</PanelMessage>;
