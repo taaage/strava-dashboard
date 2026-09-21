@@ -1,4 +1,4 @@
-import { type RideStream } from "../../api/api";
+import { type RideStreamSummary } from "../../api/api";
 
 export const DURATIONS: { key: string; seconds: number }[] = [
   { key: "5s", seconds: 5 },
@@ -47,31 +47,15 @@ export const REFERENCE: Record<string, number> = (() => {
   }
 })();
 
-export function computeBestEffort(
-  watts: number[],
-  durationSeconds: number,
-): number {
-  if (watts.length < durationSeconds) return 0;
-  let maxAvg = 0;
-  let windowSum = 0;
-  for (let i = 0; i < durationSeconds; i++) windowSum += watts[i];
-  maxAvg = windowSum / durationSeconds;
-  for (let i = durationSeconds; i < watts.length; i++) {
-    windowSum += watts[i] - watts[i - durationSeconds];
-    const avg = windowSum / durationSeconds;
-    if (avg > maxAvg) maxAvg = avg;
-  }
-  return Math.round(maxAvg);
-}
-
-export function computeRecords(streams: RideStream[]): Record<string, number> {
+export function computeRecords(
+  summaries: RideStreamSummary[],
+): Record<string, number> {
   const records: Record<string, number> = {};
   DURATIONS.forEach(({ key }) => (records[key] = 0));
 
-  for (const stream of streams) {
-    if (stream.watts.length === 0) continue;
+  for (const summary of summaries) {
     for (const { key, seconds } of DURATIONS) {
-      const best = computeBestEffort(stream.watts, seconds);
+      const best = summary.bestEfforts[seconds] ?? 0;
       if (best > records[key]) records[key] = best;
     }
   }
@@ -79,10 +63,10 @@ export function computeRecords(streams: RideStream[]): Record<string, number> {
 }
 
 export function filterStreamsByDays(
-  streams: RideStream[],
+  summaries: RideStreamSummary[],
   days: number,
-): RideStream[] {
+): RideStreamSummary[] {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - days);
-  return streams.filter((s) => new Date(s.date) >= cutoff);
+  return summaries.filter((s) => new Date(s.date) >= cutoff);
 }

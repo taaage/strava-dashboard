@@ -8,7 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { type AthleteZones, type RideStream } from "../../api/api";
+import { type AthleteZones, type RideStreamSummary } from "../../api/api";
 import { TimeRangeSelector } from "../../shared";
 import {
   computeHrZones,
@@ -17,7 +17,7 @@ import {
 } from "./utils";
 
 interface ZoneChartsProps {
-  streams: RideStream[];
+  streams: RideStreamSummary[];
   athleteZones: AthleteZones;
 }
 

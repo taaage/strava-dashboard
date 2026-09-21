@@ -8,11 +8,10 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { type RideStream } from "../../api/api";
-import { computeBestEffort } from "../power/utils";
+import { type RideStreamSummary } from "../../api/api";
 
 interface PowerCurveProps {
-  streams: RideStream[];
+  streams: RideStreamSummary[];
 }
 
 const CURVE_DURATIONS = [
@@ -35,26 +34,25 @@ function formatDuration(seconds: number): string {
   return `${(seconds / 3600).toFixed(1)}h`;
 }
 
-function computePowerCurve(streams: RideStream[]): Record<number, { watts: number; activityId: number }> {
+function computePowerCurve(summaries: RideStreamSummary[]): Record<number, { watts: number; activityId: number }> {
   const envelope: Record<number, { watts: number; activityId: number }> = {};
   for (const duration of CURVE_DURATIONS) {
     envelope[duration] = { watts: 0, activityId: 0 };
   }
-  for (const stream of streams) {
-    if (stream.watts.length === 0) continue;
+  for (const summary of summaries) {
     for (const duration of CURVE_DURATIONS) {
-      const best = computeBestEffort(stream.watts, duration);
+      const best = summary.bestEfforts[duration] ?? 0;
       if (best > envelope[duration].watts) {
-        envelope[duration] = { watts: best, activityId: stream.activityId };
+        envelope[duration] = { watts: best, activityId: summary.activityId };
       }
     }
   }
   return envelope;
 }
 
-function getAvailableYears(streams: RideStream[]): string[] {
+function getAvailableYears(summaries: RideStreamSummary[]): string[] {
   const years = new Set<string>();
-  for (const s of streams) {
+  for (const s of summaries) {
     if (s.date) years.add(new Date(s.date).getFullYear().toString());
   }
   return Array.from(years).sort().reverse();

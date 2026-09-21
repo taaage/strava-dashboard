@@ -7,7 +7,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { type RideStream } from "../../api/api";
+import { type RideStreamSummary } from "../../api/api";
 import { TimeRangeSelector } from "../../shared";
 import {
   DURATIONS,
@@ -17,7 +17,7 @@ import {
 } from "./utils";
 
 interface PowerRadarProps {
-  streams: RideStream[];
+  streams: RideStreamSummary[];
 }
 
 const REFERENCE_LABEL = (import.meta.env.VITE_POWER_REFERENCE_LABEL as string) ?? "Cat B reference";

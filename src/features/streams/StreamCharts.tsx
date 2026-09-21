@@ -12,7 +12,7 @@ import {
   ZAxis,
   Cell,
 } from "recharts";
-import { type RideStream } from "../../api/api";
+import { type RideStreamSummary } from "../../api/api";
 import { ChartCard } from "../../shared";
 import {
   type RideCategory,
@@ -22,7 +22,7 @@ import {
 } from "./utils";
 
 interface StreamChartsProps {
-  streams: RideStream[];
+  streams: RideStreamSummary[];
 }
 
 export function HrVsPowerChart({ streams }: StreamChartsProps) {

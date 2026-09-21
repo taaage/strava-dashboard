@@ -53,13 +53,24 @@ interface RideTotals {
   elevation_gain: number;
 }
 
-export interface RideStream {
+// Precomputed dashboard-ready aggregate for a ride's power/HR/cadence
+// streams. The backend never ships raw per-second arrays for chart data —
+// only this small summary (see strava-api's stream-summary.service.ts).
+export interface RideStreamSummary {
   activityId: number;
   date: string;
   name: string;
-  watts: number[];
-  heartrate: number[] | null;
-  cadence: number[] | null;
+  // seconds -> best average watts for that duration, within this ride.
+  bestEfforts: Record<number, number>;
+  avgWatts: number | null;
+  avgHr: number | null;
+  hrDropout: boolean;
+  // 5rpm bucket -> seconds spent there (coasting excluded).
+  cadenceHistogram: Record<number, number>;
+  // Seconds spent in each zone, index-aligned with the athlete's current
+  // power/HR zone boundaries (see AthleteZones below).
+  powerZoneSeconds: number[] | null;
+  hrZoneSeconds: number[] | null;
 }
 
 const EMPTY_STATS: StravaStats = {
@@ -121,7 +132,7 @@ export function getActivities(): Promise<StravaActivity[]> {
   return apiFetch("/api/activities", []);
 }
 
-export function getRideStreams(): Promise<RideStream[]> {
+export function getRideStreams(): Promise<RideStreamSummary[]> {
   return apiFetch("/api/ride-streams", []);
 }
 

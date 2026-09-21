@@ -1,4 +1,4 @@
-import { type RideStream } from "../../api/api";
+import { type RideStreamSummary } from "../../api/api";
 
 export type RideCategory = "Race" | "Tempo" | "Endurance" | "Recovery";
 
@@ -60,41 +60,25 @@ export interface HrPowerPoint {
   category: RideCategory;
 }
 
-export function computeHrVsPower(streams: RideStream[]): HrPowerPoint[] {
-  return streams
-    .filter((s) => s.heartrate && s.heartrate.length > 0 && s.watts.length > 0)
-    .filter((s) => {
-      // Exclude rides with >10% zero/low HR readings (sensor dropouts)
-      const lowReadings = s.heartrate!.filter((hr) => hr < 60).length;
-      return lowReadings / s.heartrate!.length < 0.1;
-    })
-    .map((s) => {
-      const avgWatts = Math.round(
-        s.watts.reduce((a, b) => a + b, 0) / s.watts.length,
-      );
-      const avgHr = Math.round(
-        s.heartrate!.reduce((a, b) => a + b, 0) / s.heartrate!.length,
-      );
-      return {
-        activityId: s.activityId,
-        name: s.name,
-        watts: avgWatts,
-        hr: avgHr,
-        category: categorizeRide(avgWatts),
-      };
-    })
+export function computeHrVsPower(summaries: RideStreamSummary[]): HrPowerPoint[] {
+  return summaries
+    .filter((s) => s.avgHr != null && s.avgWatts != null && !s.hrDropout)
+    .map((s) => ({
+      activityId: s.activityId,
+      name: s.name,
+      watts: s.avgWatts!,
+      hr: s.avgHr!,
+      category: categorizeRide(s.avgWatts!),
+    }))
     .filter((d) => d.hr >= 80 && d.hr <= 210 && d.watts >= 50);
 }
 
-export function computeCadenceDistribution(streams: RideStream[]) {
+export function computeCadenceDistribution(summaries: RideStreamSummary[]) {
   const buckets: Record<number, number> = {};
 
-  for (const stream of streams) {
-    if (!stream.cadence) continue;
-    for (const c of stream.cadence) {
-      if (c === 0) continue; // skip coasting
-      const bucket = Math.floor(c / 5) * 5;
-      buckets[bucket] = (buckets[bucket] || 0) + 1;
+  for (const summary of summaries) {
+    for (const [bucket, seconds] of Object.entries(summary.cadenceHistogram)) {
+      buckets[Number(bucket)] = (buckets[Number(bucket)] || 0) + seconds;
     }
   }
 

@@ -1,20 +1,20 @@
 import { useMemo } from "react";
-import { type RideStream } from "../../api/api";
-import { computeBestEffort } from "./utils";
+import { type RideStreamSummary } from "../../api/api";
 
 interface FtpHistoryProps {
-  streams: RideStream[];
+  streams: RideStreamSummary[];
 }
 
-function computeFtpByYear(streams: RideStream[]) {
+function computeFtpByYear(summaries: RideStreamSummary[]) {
   const yearMap = new Map<number, { ftp: number; activityId: number }>();
-  for (const stream of streams) {
-    if (stream.watts.length < 1200) continue;
-    const year = new Date(stream.date).getFullYear();
-    const ftp = Math.round(computeBestEffort(stream.watts, 1200) * 0.95);
+  for (const summary of summaries) {
+    const best20min = summary.bestEfforts[1200] ?? 0;
+    if (best20min === 0) continue;
+    const year = new Date(summary.date).getFullYear();
+    const ftp = Math.round(best20min * 0.95);
     const existing = yearMap.get(year);
     if (!existing || ftp > existing.ftp) {
-      yearMap.set(year, { ftp, activityId: stream.activityId });
+      yearMap.set(year, { ftp, activityId: summary.activityId });
     }
   }
   return Array.from(yearMap.entries())

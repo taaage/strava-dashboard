@@ -1,4 +1,4 @@
-import { type RideStream, type AthleteZones } from "../../api/api";
+import { type RideStreamSummary, type AthleteZones } from "../../api/api";
 
 const POWER_ZONE_NAMES = [
   "Z1 Recovery",
@@ -25,64 +25,64 @@ export interface ZoneEntry {
   percentage: number;
 }
 
-function buildZoneBoundaries(zones: { min: number; max: number }[], names: string[]) {
-  return zones.map((z, i) => ({
-    min: z.min,
-    max: z.max === -1 ? 9999 : z.max,
-    name: names[i] ?? `Z${i + 1}`,
-  }));
+function buildZoneNames(count: number, names: string[]): string[] {
+  return Array.from({ length: count }, (_, i) => names[i] ?? `Z${i + 1}`);
 }
 
-function computeTimeInZones(
-  data: number[],
-  zoneBoundaries: { min: number; max: number; name: string }[],
+function sumZoneSeconds(
+  summaries: RideStreamSummary[],
+  pick: (s: RideStreamSummary) => number[] | null,
+  zoneCount: number,
+  names: string[],
 ): ZoneEntry[] {
-  const counts = zoneBoundaries.map((z) => ({ name: z.name, seconds: 0 }));
-
-  for (const value of data) {
-    for (let i = 0; i < zoneBoundaries.length; i++) {
-      if (value >= zoneBoundaries[i].min && value < zoneBoundaries[i].max) {
-        counts[i].seconds++;
-        break;
-      }
+  const totals = new Array(zoneCount).fill(0);
+  for (const summary of summaries) {
+    const seconds = pick(summary);
+    if (!seconds) continue;
+    for (let i = 0; i < zoneCount; i++) {
+      totals[i] += seconds[i] ?? 0;
     }
   }
 
-  const total = counts.reduce((s, z) => s + z.seconds, 0);
-  return counts.map((z) => ({
-    name: z.name,
-    seconds: z.seconds,
-    hours: Math.round((z.seconds / 3600) * 10) / 10,
-    percentage: total > 0 ? Math.round((z.seconds / total) * 100) : 0,
+  const total = totals.reduce((s, v) => s + v, 0);
+  const zoneNames = buildZoneNames(zoneCount, names);
+  return totals.map((seconds, i) => ({
+    name: zoneNames[i],
+    seconds,
+    hours: Math.round((seconds / 3600) * 10) / 10,
+    percentage: total > 0 ? Math.round((seconds / total) * 100) : 0,
   }));
 }
 
-export function computePowerZones(streams: RideStream[], athleteZones: AthleteZones): ZoneEntry[] {
-  const boundaries = buildZoneBoundaries(athleteZones.power.zones, POWER_ZONE_NAMES);
-  const allWatts: number[] = [];
-
-  for (const stream of streams) {
-    if (stream.watts.length === 0) continue;
-    allWatts.push(...stream.watts);
-  }
-
-  return computeTimeInZones(allWatts, boundaries);
+export function computePowerZones(
+  summaries: RideStreamSummary[],
+  athleteZones: AthleteZones,
+): ZoneEntry[] {
+  return sumZoneSeconds(
+    summaries,
+    (s) => s.powerZoneSeconds,
+    athleteZones.power.zones.length,
+    POWER_ZONE_NAMES,
+  );
 }
 
-export function computeHrZones(streams: RideStream[], athleteZones: AthleteZones): ZoneEntry[] {
-  const boundaries = buildZoneBoundaries(athleteZones.heart_rate.zones, HR_ZONE_NAMES);
-  const allHr: number[] = [];
-
-  for (const stream of streams) {
-    if (!stream.heartrate || stream.heartrate.length === 0) continue;
-    allHr.push(...stream.heartrate);
-  }
-
-  return computeTimeInZones(allHr, boundaries);
+export function computeHrZones(
+  summaries: RideStreamSummary[],
+  athleteZones: AthleteZones,
+): ZoneEntry[] {
+  return sumZoneSeconds(
+    summaries,
+    (s) => s.hrZoneSeconds,
+    athleteZones.heart_rate.zones.length,
+    HR_ZONE_NAMES,
+  );
 }
 
-export function filterStreamsByDays(streams: RideStream[], days: number): RideStream[] {
+export function filterStreamsByDays(
+  summaries: RideStreamSummary[],
+  days: number,
+): RideStreamSummary[] {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - days);
-  return streams.filter((s) => new Date(s.date) >= cutoff);
+  return summaries.filter((s) => new Date(s.date) >= cutoff);
 }
