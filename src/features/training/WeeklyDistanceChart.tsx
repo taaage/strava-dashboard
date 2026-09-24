@@ -58,9 +58,9 @@ export function WeeklyAreaChart({ activities }: WeeklyAreaChartProps) {
   const timeRange = useTimeRange(90);
   const data = getWeeklyData(activities, timeRange.days);
   const { visible, toggle } = useLineToggle({
-    outdoor: true,
+    outdoor: false,
     indoor: false,
-    total: false,
+    total: true,
   });
 
   return (

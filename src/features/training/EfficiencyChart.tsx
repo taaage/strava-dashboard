@@ -15,7 +15,7 @@ interface EfficiencyAreaChartProps {
 }
 
 export function EfficiencyAreaChart({ activities }: EfficiencyAreaChartProps) {
-  const timeRange = useTimeRange(90);
+  const timeRange = useTimeRange(30);
 
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - timeRange.days);

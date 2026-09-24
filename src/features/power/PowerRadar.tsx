@@ -23,7 +23,7 @@ interface PowerRadarProps {
 const REFERENCE_LABEL = (import.meta.env.VITE_POWER_REFERENCE_LABEL as string) ?? "Cat B reference";
 
 export function PowerRadar({ streams }: PowerRadarProps) {
-  const [days, setDays] = useState(90);
+  const [days, setDays] = useState(30);
 
   const allTimeRecords = useMemo(() => computeRecords(streams), [streams]);
   const filteredStreams = useMemo(

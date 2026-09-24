@@ -72,7 +72,7 @@ function getWeeklyTSS(activities: StravaActivity[], days: number, ftp: number) {
 }
 
 export function WeeklyTSSChart({ activities, ftp }: WeeklyTSSChartProps) {
-  const timeRange = useTimeRange(90);
+  const timeRange = useTimeRange(30);
   const data = getWeeklyTSS(activities, timeRange.days, ftp);
 
   return (
