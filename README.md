@@ -14,7 +14,7 @@ This is the **frontend** — it reads data from the companion [strava-api](#stra
 - **Goals** — Weekly, monthly, and yearly distance targets with radial progress rings
 - **Year Progress** — Cumulative distance chart comparing multiple years + goal pace line
 - **Stats** — YTD and all-time totals with year-over-year comparison
-- **Power Radar** — Best efforts across 14 durations vs a configurable reference profile
+- **Power Radar** — Best efforts across 16 durations vs a configurable reference profile
 - **Power Curve** — Classic power duration curve with per-year comparison
 - **HR vs Power** — Aerobic efficiency scatter plot (W/bpm per ride, categorized)
 - **Cadence Distribution** — Time-in-cadence histogram
@@ -78,7 +78,7 @@ VITE_YEARLY_GOAL_KM=10000      # Default: 10000
 The radar chart compares your best efforts against a reference. Default is ~Cat B racing (~3.6 W/kg @ 85 kg). Override with your own targets:
 
 ```env
-VITE_POWER_REFERENCE='{"5s":1000,"15s":800,"30s":600,"1min":480,"2min":400,"3min":370,"5min":340,"8min":320,"10min":310,"15min":300,"20min":290,"30min":275,"45min":260,"60min":250}'
+VITE_POWER_REFERENCE='{"5s":1000,"10s":900,"15s":800,"30s":600,"1min":480,"2min":400,"3min":370,"4min":350,"5min":340,"8min":320,"10min":310,"15min":300,"20min":290,"30min":275,"45min":260,"60min":250}'
 VITE_POWER_REFERENCE_LABEL=My targets
 ```
 
