@@ -121,7 +121,7 @@ export function PowerRadar({ streams }: PowerRadarProps) {
           </RadarChart>
         </ResponsiveContainer>
       </div>
-      <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 mt-4 text-center">
+      <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 mt-4 text-center">
         {chartData.map((d) => (
           <div key={d.effort}>
             <p className="text-base font-semibold text-text-primary">
